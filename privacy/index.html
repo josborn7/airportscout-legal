@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AirportScout — Privacy Policy</title>
+<style>
+  :root {
+    --paper: #F8FBFF;
+    --ink: #1D2733;
+    --muted: #64748E;
+    --line: #DFE8F4;
+    --accent: #0071E3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10161F;
+      --ink: #E8EEF7;
+      --muted: #93A2BA;
+      --line: #2C3648;
+      --accent: #55A6FF;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.65;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+  }
+  .eyebrow a { color: var(--accent); text-decoration: none; }
+  .eyebrow a:hover { text-decoration: underline; }
+  h1 {
+    font-size: clamp(26px, 5vw, 36px); font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 6px;
+  }
+  .date { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+  h2 {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+    margin: 40px 0 10px; padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  h3 { font-size: 16px; font-weight: 650; margin: 24px 0 6px; }
+  p, li { font-size: 16px; max-width: 65ch; }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  strong { font-weight: 650; }
+  a { color: var(--accent); }
+  footer {
+    max-width: 720px; margin: 0 auto; padding: 0 24px 48px;
+    font-size: 14px; color: var(--muted);
+  }
+  footer a { margin-right: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow"><a href="/">AirportScout</a></p>
+  <h1>Privacy Policy</h1>
+  <p class="date">Effective date: July 19, 2026</p>
+
+  <p>AirportScout shows live airport security wait times, combining reports from travelers
+  with published TSA data. This policy explains what information the app handles, where it
+  goes, and what control you have over it. We collect the minimum needed to make
+  crowd-sourced wait times work — no ads, no data sales, no tracking across other apps.</p>
+
+  <h2>Information we collect</h2>
+
+  <h3>Account information</h3>
+  <ul>
+    <li><strong>Anonymous account (default).</strong> When you first use AirportScout, we
+    create an anonymous account identified by a random ID. No name, email, or phone number
+    is required.</li>
+    <li><strong>Optional sign-in.</strong> You can sign in with email, Google, or Apple to
+    keep your history across devices. We then store your email address and, if your provider
+    shares it, your name. If you upgrade from an anonymous account, your existing reports
+    move to the signed-in account.</li>
+    <li><strong>Display name.</strong> You can choose a display name, which appears on the
+    community leaderboard. Pick anything — it doesn't have to identify you.</li>
+  </ul>
+
+  <h3>Wait-time reports</h3>
+  <p>When you submit or confirm a wait time, we store the airport, checkpoint, lane type,
+  the wait you reported, the time of the report, and your account ID. The wait time,
+  airport, and time of your reports are shared with other travelers as part of the app's
+  live wait estimates; your account ID and display name are <strong>not</strong> shown
+  alongside individual reports.</p>
+
+  <h3>Activity stats</h3>
+  <p>We keep counts of your reports and confirmations to power in-app badges and the
+  leaderboard (shown with your display name, if you set one).</p>
+
+  <h3>Location</h3>
+  <p>The app uses your device location in two ways, both <strong>entirely on your
+  device</strong>:</p>
+  <ul>
+    <li><strong>Nearby airport suggestions.</strong> When you pick your home airport, the
+    app can read your location once to suggest airports near you. This is optional — you
+    can always choose an airport manually.</li>
+    <li><strong>At-airport check for reports.</strong> To keep wait-time reports
+    trustworthy, when you submit a report the app checks your location on your device to
+    confirm you're at the airport. Only the report itself (airport, checkpoint, wait time)
+    is sent — your coordinates are not included.</li>
+  </ul>
+  <p>In both cases your location is never stored and never leaves your device. Location
+  permission is optional for browsing wait times, but is required to submit reports.</p>
+
+  <h3>Crash reports</h3>
+  <p>Builds with crash reporting enabled send crash details (device model, operating system
+  version, and technical error information) to Sentry so we can fix bugs. Crash reports are
+  not linked to your account.</p>
+
+  <h3>What we don't collect</h3>
+  <p>No advertising identifiers, no contact lists, no precise location history, no
+  background location, no analytics profiles, and no data purchased from or sold to
+  anyone.</p>
+
+  <h2>How we use information</h2>
+  <ul>
+    <li>Show live, crowd-sourced security wait times to travelers</li>
+    <li>Weight and validate reports so estimates stay accurate</li>
+    <li>Display community stats and leaderboards</li>
+    <li>Fix crashes and keep the app reliable</li>
+  </ul>
+  <p>We do not sell your information or use it for advertising.</p>
+
+  <h2>Where your information lives</h2>
+  <ul>
+    <li><strong>On your device.</strong> Settings, your home airport, recent reports, and
+    badge progress are stored locally.</li>
+    <li><strong>Supabase.</strong> Our backend (accounts, reports, stats) is hosted on
+    Supabase. TSA wait-time data we display comes from published TSA sources and contains
+    no personal information.</li>
+    <li><strong>Sentry.</strong> Crash reports only, as described above.</li>
+    <li><strong>Google / Apple.</strong> Only if you choose to sign in with them, under
+    their own privacy policies.</li>
+  </ul>
+
+  <h2>Data retention and deletion</h2>
+  <p>You can delete your account at any time in the app
+  (<strong>Profile → Delete account</strong>). This permanently removes your account,
+  sign-in credentials, and gamification stats from our backend. Wait-time reports you
+  previously contributed are retained in anonymized form: the link to your account (your
+  user identifier) and any free-text comment you added are permanently removed from those
+  reports. What remains is the airport and checkpoint, the reported wait time, the line
+  type, and the timestamp — data that can no longer be associated with you or any other
+  person. Data stored on your device is removed when you uninstall the app.</p>
+  <p>If you have trouble deleting your account in the app, email us (address below) and
+  we'll do it for you.</p>
+
+  <h2>Your rights</h2>
+  <p>Depending on where you live (for example, under GDPR or the CCPA), you may have rights
+  to access, correct, delete, or export your personal information. Since AirportScout
+  collects very little, most of this is visible directly in the app — but you can always
+  contact us to exercise any of these rights. We will never discriminate against you for
+  doing so.</p>
+
+  <h2>Children</h2>
+  <p>AirportScout is not directed at children under 13, and we do not knowingly collect
+  personal information from them. If you believe a child has provided us personal
+  information, contact us and we will delete it.</p>
+
+  <h2>Changes to this policy</h2>
+  <p>If we change this policy, we'll update the effective date above and, for significant
+  changes, note it in the app. Continued use after a change means you accept the updated
+  policy.</p>
+
+  <h2>Contact</h2>
+  <p>Questions or requests:
+  <a href="mailto:support@airportscout.app">support@airportscout.app</a></p>
+</main>
+<footer>
+  <a href="/">Home</a>
+  <a href="/terms/">Terms of Service</a>
+</footer>
+</body>
+</html>

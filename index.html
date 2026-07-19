@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AirportScout — Live TSA Security Wait Times</title>
+<meta name="description" content="AirportScout shows live airport security wait times, combining traveler reports with published TSA data.">
+<style>
+  :root {
+    --paper: #F8FBFF;
+    --ink: #1D2733;
+    --muted: #64748E;
+    --line: #DFE8F4;
+    --accent: #0071E3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10161F;
+      --ink: #E8EEF7;
+      --muted: #93A2BA;
+      --line: #2C3648;
+      --accent: #55A6FF;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.65;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 96px 24px 48px;
+    flex: 1;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+  }
+  h1 {
+    font-size: clamp(30px, 6vw, 44px); font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.12; margin: 0 0 14px;
+  }
+  .tagline { color: var(--muted); font-size: 18px; max-width: 52ch; margin: 0 0 32px; }
+  .soon {
+    display: inline-block; font-size: 14px; font-weight: 600;
+    color: var(--accent); border: 1px solid var(--line);
+    border-radius: 999px; padding: 6px 14px; margin-bottom: 40px;
+  }
+  a { color: var(--accent); }
+  footer {
+    border-top: 1px solid var(--line);
+    padding: 24px;
+    text-align: center;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  footer nav { margin-bottom: 10px; }
+  footer nav a { margin: 0 10px; text-decoration: none; }
+  footer nav a:hover { text-decoration: underline; }
+  .disclaimer { font-size: 12.5px; max-width: 60ch; margin: 0 auto; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow">AirportScout</p>
+  <h1>Know the line before you're in it.</h1>
+  <p class="tagline">Live airport security wait times, combining reports from travelers
+  with published TSA data — so you know exactly when to leave for the airport.</p>
+  <span class="soon">Coming soon to iOS and Android</span>
+  <p>Questions or feedback: <a href="mailto:support@airportscout.app">support@airportscout.app</a></p>
+</main>
+<footer>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/privacy/">Privacy Policy</a>
+    <a href="/terms/">Terms of Service</a>
+  </nav>
+  <p class="disclaimer">AirportScout is an independent app and is not affiliated with,
+  endorsed by, or sponsored by the Transportation Security Administration (TSA) or any
+  airport authority. Wait times are estimates for informational purposes only.</p>
+</footer>
+</body>
+</html>
