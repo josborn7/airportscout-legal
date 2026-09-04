@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AirportScout — Delete Your Account</title>
+<style>
+  :root {
+    --paper: #F8FBFF;
+    --ink: #1D2733;
+    --muted: #64748E;
+    --line: #DFE8F4;
+    --accent: #0071E3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper: #10161F;
+      --ink: #E8EEF7;
+      --muted: #93A2BA;
+      --line: #2C3648;
+      --accent: #55A6FF;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    line-height: 1.65;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 56px 24px 96px;
+  }
+  .eyebrow {
+    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
+  }
+  .eyebrow a { color: var(--accent); text-decoration: none; }
+  .eyebrow a:hover { text-decoration: underline; }
+  h1 {
+    font-size: clamp(26px, 5vw, 36px); font-weight: 800;
+    letter-spacing: -0.02em; line-height: 1.15; margin: 0 0 6px;
+  }
+  .date { color: var(--muted); font-size: 14px; margin: 0 0 28px; }
+  h2 {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.01em;
+    margin: 40px 0 10px; padding-top: 24px; border-top: 1px solid var(--line);
+  }
+  h3 { font-size: 16px; font-weight: 650; margin: 24px 0 6px; }
+  p, li { font-size: 16px; max-width: 65ch; }
+  ul { padding-left: 22px; }
+  li { margin: 6px 0; }
+  strong { font-weight: 650; }
+  a { color: var(--accent); }
+  footer {
+    max-width: 720px; margin: 0 auto; padding: 0 24px 48px;
+    font-size: 14px; color: var(--muted);
+  }
+  footer a { margin-right: 16px; }
+</style>
+</head>
+<body>
+<main>
+  <p class="eyebrow"><a href="/">AirportScout</a></p>
+  <h1>Delete your AirportScout account</h1>
+  <p class="date">Developer: AirportScout (independent developer) &middot; App: AirportScout on iOS and Android</p>
+
+  <p>Deleting your account permanently removes your profile, sign-in credentials, and
+  gamification stats. Wait-time reports you contributed are kept in anonymized form &mdash;
+  your identity and any comments are permanently stripped, leaving only the airport, wait
+  time, and timestamp, which cannot be linked back to you.</p>
+
+  <h2>How to delete your account</h2>
+  <ul>
+    <li><strong>In the app.</strong> Open <strong>Profile &rarr; Delete account</strong> and
+    confirm. Deletion takes effect immediately.</li>
+    <li><strong>By email.</strong> Send a request to
+    <a href="mailto:support@airportscout.app?subject=Delete%20my%20AirportScout%20account">support@airportscout.app</a>
+    from any address. Include the display name you used in the app, if you set one, so we
+    can find the account. We complete email requests within 30 days.</li>
+  </ul>
+  <p>You do not need to uninstall the app first, and you can create a new account
+  afterwards at any time.</p>
+
+  <h2>What is deleted</h2>
+  <ul>
+    <li>Your account and its random user identifier</li>
+    <li>Sign-in credentials (email, Google, or Apple link)</li>
+    <li>Display name, points, badges, and leaderboard stats</li>
+  </ul>
+
+  <h2>What is kept</h2>
+  <p>Your past wait-time reports remain in anonymized form: the airport, checkpoint, line
+  type, reported wait time, and timestamp. The link to your account and any free-text
+  comment are permanently removed, so the remaining data cannot be associated with you or
+  any other person. Data stored on your device is removed when you uninstall the app.</p>
+
+  <h2>Questions</h2>
+  <p>See the <a href="/privacy/">Privacy Policy</a> for full details on the information
+  AirportScout handles, or email
+  <a href="mailto:support@airportscout.app">support@airportscout.app</a>.</p>
+</main>
+<footer>
+  <a href="/">Home</a>
+  <a href="/privacy/">Privacy Policy</a>
+  <a href="/terms/">Terms of Service</a>
+  <a href="/support/">Support</a>
+</footer>
+</body>
+</html>
