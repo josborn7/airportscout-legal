@@ -1,91 +1,414 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>AirportScout — Live TSA Security Wait Times</title>
-<meta name="description" content="AirportScout shows live airport security wait times, combining traveler reports with published TSA data.">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AirportScout — Live Airport Security Wait Times</title>
+<meta name="description" content="Never guess the security line again. AirportScout shows live airport security wait times from airport-posted waits, traveler reports and TSA data. Free on iPhone.">
+<link rel="canonical" href="https://airportscout.app/">
+<meta name="apple-itunes-app" content="app-id=6792927636">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="apple-touch-icon" href="/assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AirportScout">
+<meta property="og:title" content="AirportScout — Never guess the security line again">
+<meta property="og:description" content="Live airport security wait times from airport-posted waits, traveler reports and TSA data. Free on iPhone.">
+<meta property="og:url" content="https://airportscout.app/">
+<meta property="og:image" content="https://airportscout.app/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@800;900&display=swap">
 <style>
+  html, body { margin: 0; }
+  img { max-width: 100%; }
+  /* Layout: blue hero band (same blue world as the App Store slides) → where-the-number-comes-from → screenshot strip → closing CTA → footer. One centered 1080px column. */
   :root {
-    --paper: #F8FBFF;
-    --ink: #1D2733;
-    --muted: #64748E;
-    --line: #DFE8F4;
+    --paper: #F5F8FD;
+    --surface: #FFFFFF;
+    --ink: #0F1B2D;
+    --muted: #5A6B85;
+    --line: #DCE6F3;
     --accent: #0071E3;
+    --band-top: #1A7FF0;
+    --band-bottom: #0052C7;
+    --on-band: #FFFFFF;
+    --on-band-muted: #D6E6FF;
+    --good: #1FA64A;
+    --ok: #C98A00;
+    --chip-official: #E6F1FE;
+    --chip-crowd: #E7F6EC;
+    --chip-tsa: #EEF1F6;
+    --shadow: 0 1px 2px rgba(15,27,45,.06), 0 12px 32px rgba(15,27,45,.10);
+    --font-display: "Nunito", ui-rounded, "SF Pro Rounded", -apple-system, "Segoe UI", sans-serif;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --paper: #10161F;
-      --ink: #E8EEF7;
-      --muted: #93A2BA;
-      --line: #2C3648;
-      --accent: #55A6FF;
+    :root:not([data-theme="light"]) {
+      --paper: #0B111A; --surface: #141C28; --ink: #E8EEF7; --muted: #93A2BA; --line: #243247;
+      --accent: #4DA3FF; --band-top: #0B5AC4; --band-bottom: #062F78; --on-band: #FFFFFF; --on-band-muted: #B9D2F7;
+      --good: #3DD26B; --ok: #F2B600; --chip-official: #10284A; --chip-crowd: #10301C; --chip-tsa: #1C2533;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.45);
+      color-scheme: dark;
     }
   }
+  :root[data-theme="dark"] {
+    --paper: #0B111A; --surface: #141C28; --ink: #E8EEF7; --muted: #93A2BA; --line: #243247;
+    --accent: #4DA3FF; --band-top: #0B5AC4; --band-bottom: #062F78; --on-band: #FFFFFF; --on-band-muted: #B9D2F7;
+    --good: #3DD26B; --ok: #F2B600; --chip-official: #10284A; --chip-crowd: #10301C; --chip-tsa: #1C2533;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 12px 32px rgba(0,0,0,.45);
+    color-scheme: dark;
+  }
+
   * { box-sizing: border-box; }
-  body {
-    margin: 0;
-    background: var(--paper);
-    color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-    line-height: 1.65;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-  }
-  main {
-    max-width: 720px;
-    margin: 0 auto;
-    padding: 96px 24px 48px;
-    flex: 1;
-  }
-  .eyebrow {
-    font-size: 12px; font-weight: 600; letter-spacing: 0.14em;
-    text-transform: uppercase; color: var(--accent); margin: 0 0 10px;
-  }
-  h1 {
-    font-size: clamp(30px, 6vw, 44px); font-weight: 800;
-    letter-spacing: -0.02em; line-height: 1.12; margin: 0 0 14px;
-  }
-  .tagline { color: var(--muted); font-size: 18px; max-width: 52ch; margin: 0 0 32px; }
-  .soon {
-    display: inline-block; font-size: 14px; font-weight: 600;
-    color: var(--accent); border: 1px solid var(--line);
-    border-radius: 999px; padding: 6px 14px; margin-bottom: 40px;
-  }
+  body { background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding-inline: 20px; }
   a { color: var(--accent); }
-  footer {
-    border-top: 1px solid var(--line);
-    padding: 24px;
-    text-align: center;
-    font-size: 14px;
-    color: var(--muted);
+  a:focus-visible, .badge:focus-visible { outline: 3px solid var(--on-band); outline-offset: 3px; }
+  h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+
+  /* ---------- hero band ---------- */
+  .band { background: linear-gradient(160deg, var(--band-top), var(--band-bottom)); color: var(--on-band); position: relative; overflow: hidden; isolation: isolate; }
+  .band > canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+  .nav { display: flex; align-items: center; justify-content: space-between; padding-block: 18px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 900; font-size: 20px; color: var(--on-band); text-decoration: none; }
+  .brand img { width: 34px; height: 34px; border-radius: 8px; }
+  .nav a.plain { color: var(--on-band-muted); text-decoration: none; font-size: 15px; font-weight: 600; }
+  .hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 48px; align-items: center; padding-block: 40px 72px; }
+  .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--on-band-muted); margin: 0 0 14px; }
+  .hero h1 { font-weight: 900; font-size: clamp(38px, 6.4vw, 64px); line-height: 1.02; }
+  .lede { font-size: 19px; color: var(--on-band-muted); max-width: 48ch; margin: 20px 0 30px; }
+  .get { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; }
+  .badge { display: inline-flex; align-items: center; gap: 10px; background: #000; color: #fff; border: 1px solid rgba(255,255,255,.35); border-radius: 12px; padding: 9px 18px 9px 14px; text-decoration: none; line-height: 1.1; }
+  .badge svg { width: 26px; height: 26px; flex: none; }
+  .badge small { display: block; font-size: 11px; }
+  .badge strong { display: block; font-size: 21px; font-weight: 600; letter-spacing: -0.01em; }
+  .soon { font-size: 14px; font-weight: 600; color: var(--on-band); border: 1px solid rgba(255,255,255,.4); border-radius: 999px; padding: 7px 14px; }
+
+  /* the example card: one checkpoint, three sources */
+  .card { background: var(--surface); color: var(--ink); border-radius: 22px; box-shadow: 0 24px 60px rgba(0,20,60,.35); padding: 22px; }
+  .card-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .card-head h2 { font-size: 20px; font-weight: 900; }
+  .card-head span { font-size: 12px; color: var(--muted); }
+  .now { display: flex; align-items: baseline; gap: 6px; margin: 10px 0 2px; }
+  .now b { font-family: var(--font-display); font-weight: 900; font-size: 72px; line-height: 1; color: var(--good); font-variant-numeric: tabular-nums; }
+  .now i { font-style: normal; font-family: var(--font-display); font-weight: 800; font-size: 22px; color: var(--muted); }
+  .now-sub { font-size: 14px; color: var(--muted); margin: 0 0 16px; }
+  .src { display: grid; gap: 8px; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; border-radius: 6px; padding: 2px 7px; }
+  .t-off { background: var(--chip-official); color: var(--accent); }
+  .t-crowd { background: var(--chip-crowd); color: var(--good); }
+  .t-tsa { background: var(--chip-tsa); color: var(--muted); }
+  .row p { margin: 3px 0 0; font-size: 13px; color: var(--muted); min-width: 0; }
+  .row .min { font-weight: 700; font-variant-numeric: tabular-nums; font-size: 17px; white-space: nowrap; }
+  .example { font-size: 12px; color: var(--on-band-muted); text-align: center; margin: 12px 0 0; }
+
+  /* ---------- sources ---------- */
+  section { padding-block: 72px 16px; }
+  .sec-head { max-width: 640px; margin-bottom: 32px; }
+  .sec-head h2 { font-size: clamp(28px, 4vw, 38px); font-weight: 900; line-height: 1.1; }
+  .sec-head p { color: var(--muted); font-size: 18px; margin: 12px 0 0; }
+  .sources { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; }
+  .source { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .source h3 { font-size: 20px; font-weight: 800; }
+  .source p { margin: 0; color: var(--muted); font-size: 15.5px; }
+  .source .status { margin-top: auto; padding-top: 6px; font-size: 13px; font-weight: 700; }
+  .status.live { color: var(--accent); }
+  .status.quiet { color: var(--muted); }
+  .source .tag { align-self: flex-start; }
+
+  /* ---------- screenshots ---------- */
+  .shots { display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 14px; margin-top: 8px; }
+  .shots img { width: 232px; max-width: 70vw; aspect-ratio: 600 / 1304; height: auto; border-radius: 20px; scroll-snap-align: start; flex: none; box-shadow: var(--shadow); background: var(--band-bottom); }
+
+  .also { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 20px; margin-top: 44px; }
+  .also h3 { font-size: 17px; font-weight: 800; margin-bottom: 4px; }
+  .also p { margin: 0; color: var(--muted); font-size: 15px; }
+
+  /* ---------- closing ---------- */
+  .closing { margin-block: 80px 0; }
+  .closing .band-box { background: linear-gradient(160deg, var(--band-top), var(--band-bottom)); color: var(--on-band); border-radius: 26px; padding: 44px 32px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px; }
+  .closing h2 { font-size: clamp(26px, 3.6vw, 36px); font-weight: 900; }
+  .closing p { margin: 8px 0 0; color: var(--on-band-muted); }
+
+  footer { border-top: 1px solid var(--line); margin-top: 72px; padding-block: 28px 40px; text-align: center; font-size: 14px; color: var(--muted); }
+  footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 22px; margin-bottom: 12px; }
+  footer nav a { text-decoration: none; font-weight: 600; }
+  footer .disc { max-width: 62ch; margin: 12px auto 0; font-size: 13px; }
+
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: minmax(0, 1fr); gap: 36px; padding-block: 16px 48px; }
+    .sources { grid-template-columns: minmax(0, 1fr); }
+    .also { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-  footer nav { margin-bottom: 10px; }
-  footer nav a { margin: 0 10px; text-decoration: none; }
-  footer nav a:hover { text-decoration: underline; }
-  .disclaimer { font-size: 12.5px; max-width: 60ch; margin: 0 auto; }
+  @media (max-width: 480px) {
+    .also { grid-template-columns: minmax(0, 1fr); }
+    .now b { font-size: 60px; }
+    .closing .band-box { padding: 32px 22px; }
+  }
 </style>
+
 </head>
 <body>
-<main>
-  <p class="eyebrow">AirportScout</p>
-  <h1>Know the line before you're in it.</h1>
-  <p class="tagline">Live airport security wait times, combining reports from travelers
-  with published TSA data — so you know exactly when to leave for the airport.</p>
-  <span class="soon">Coming soon to iOS and Android</span>
-  <p>Questions or feedback: <a href="mailto:support@airportscout.app">support@airportscout.app</a></p>
+<header class="band">
+  <canvas id="routes" aria-hidden="true"></canvas>
+  <div class="wrap">
+    <div class="nav">
+      <a class="brand" href="#top"><img src="/assets/icon.png" alt="">AirportScout</a>
+      <a class="plain" href="/support/">Support</a>
+    </div>
+    <div class="hero" id="top">
+      <div>
+        <p class="eyebrow">Live airport security wait times</p>
+        <h1>Never guess the security line again.</h1>
+        <p class="lede">AirportScout shows how long the security line is right now, using waits posted by the airport, reports from travelers in line, and published TSA data. Check it before you leave for the airport.</p>
+        <div class="get">
+          <a class="badge" href="https://apps.apple.com/app/id6792927636" aria-label="Download on the App Store">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFFFFF" d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z"/></svg>
+            <span><small>Download on the</small><strong>App Store</strong></span>
+          </a>
+          <span class="soon">Android coming soon</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="card" aria-label="Example checkpoint from the app">
+          <div class="card-head">
+            <h2>DFW · Terminal D</h2>
+            <span>Standard lane</span>
+          </div>
+          <div class="now"><b>12</b><i>min</i></div>
+          <p class="now-sub">Posted by DFW 4 min ago</p>
+          <div class="src">
+            <div class="row">
+              <div><span class="tag t-off">Airport official</span><p>DFW's own posted wait for this checkpoint</p></div>
+              <span class="min">12 min</span>
+            </div>
+            <div class="row">
+              <div><span class="tag t-crowd">Traveler report</span><p>"Moving fast, 3 lanes open" · 9 min ago</p></div>
+              <span class="min">10 min</span>
+            </div>
+            <div class="row">
+              <div><span class="tag t-tsa">TSA data</span><p>Typical for a Wednesday at 5 pm</p></div>
+              <span class="min">15 min</span>
+            </div>
+          </div>
+        </div>
+        <p class="example">Example of a checkpoint in the app</p>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <section>
+    <div class="sec-head">
+      <h2>Where the number comes from</h2>
+      <p>Each checkpoint shows one wait time, and the app always tells you where it came from.</p>
+    </div>
+    <div class="sources">
+      <div class="source">
+        <span class="tag t-off">Airport official</span>
+        <h3>Posted by the airport</h3>
+        <p>Some airports publish their own wait for each checkpoint. AirportScout checks it every few minutes and shows it lane by lane.</p>
+        <span class="status live">Live at DFW · more airports coming</span>
+      </div>
+      <div class="source">
+        <span class="tag t-crowd">Traveler report</span>
+        <h3>Reported from the line</h3>
+        <p>Travelers standing in line tap how long they waited, with an optional note like "line wraps past the kiosks." You see what the line is doing now.</p>
+        <span class="status quiet">Every airport, from travelers like you</span>
+      </div>
+      <div class="source">
+        <span class="tag t-tsa">TSA data</span>
+        <h3>Filled in by TSA data</h3>
+        <p>When nobody has reported yet, published TSA wait data fills the gap, and the app labels it as an estimate.</p>
+        <span class="status quiet">US airports with TSA checkpoints</span>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head">
+      <h2>A look inside</h2>
+    </div>
+    <div class="shots" tabindex="0" aria-label="App screenshots">
+      <img src="/assets/slide-1.jpg" alt="Home screen showing a 24 minute wait at LAX Terminal 4" loading="lazy">
+      <img src="/assets/slide-2.jpg" alt="Recent traveler reports, trending down 6 minutes" loading="lazy">
+      <img src="/assets/slide-3.jpg" alt="Today's wait trend chart with hourly look ahead" loading="lazy">
+      <img src="/assets/slide-4.jpg" alt="Reporting a wait in two taps" loading="lazy">
+      <img src="/assets/slide-5.jpg" alt="Leaderboard and trophies for reporters" loading="lazy">
+    </div>
+
+    <div class="also">
+      <div><h3>Every lane</h3><p>Standard, TSA PreCheck and CLEAR, each with its own wait.</p></div>
+      <div><h3>See the rush coming</h3><p>An hourly trend for today, with a look at the hours ahead.</p></div>
+      <div><h3>Report in seconds</h3><p>Two taps at the checkpoint. It saves even with no signal and sends later.</p></div>
+      <div><h3>Earn your badges</h3><p>Every report earns points toward badges and the leaderboard.</p></div>
+    </div>
+  </section>
+
+  <div class="closing">
+    <div class="band-box">
+      <div>
+        <h2>Check the line before you leave.</h2>
+        <p>Free on iPhone. Android is on the way.</p>
+      </div>
+      <a class="badge" href="https://apps.apple.com/app/id6792927636" aria-label="Download on the App Store">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#FFFFFF" d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.206-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.71-3.43 2.71-1.517 0-1.9-.88-3.63-.88-1.698 0-2.302.91-3.67.91-1.377 0-2.332-1.26-3.428-2.8-1.287-1.82-2.323-4.63-2.323-7.28 0-4.28 2.797-6.55 5.552-6.55 1.448 0 2.675.95 3.6.95.865 0 2.222-1.01 3.902-1.01.613 0 2.886.06 4.374 2.19-.13.09-2.383 1.37-2.383 4.19 0 3.26 2.854 4.42 2.955 4.45z"/></svg>
+        <span><small>Download on the</small><strong>App Store</strong></span>
+      </a>
+    </div>
+  </div>
 </main>
+
 <footer>
-  <nav>
-    <a href="/">Home</a>
-    <a href="/privacy/">Privacy Policy</a>
-    <a href="/terms/">Terms of Service</a>
-    <a href="/support/">Support</a>
-  </nav>
-  <p class="disclaimer">AirportScout is an independent app and is not affiliated with,
-  endorsed by, or sponsored by the Transportation Security Administration (TSA) or any
-  airport authority. Wait times are estimates for informational purposes only.</p>
+  <div class="wrap">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/terms/">Terms of Service</a>
+      <a href="/support/">Support</a>
+    </nav>
+    <div>Questions or feedback: <a href="mailto:support@airportscout.app">support@airportscout.app</a></div>
+    <p class="disc">AirportScout is an independent app and is not affiliated with, endorsed by, or sponsored by the Transportation Security Administration (TSA) or any airport authority. Wait times are estimates for informational purposes only.</p>
+  </div>
 </footer>
+
+<script>
+(() => {
+  // Ambient hero motion: dashed flight routes draw between airports, a plane rides the leading edge,
+  // the destination pulses on arrival. Canvas, not video: no download, loops forever, crisp at any DPR.
+  const canvas = document.getElementById('routes');
+  const band = canvas.parentElement;
+  const ctx = canvas.getContext('2d');
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  // Loose US-map layout, normalized to the band.
+  const AIRPORTS = [
+    ['SEA', .06, .16], ['SFO', .04, .46], ['LAX', .09, .70], ['DEN', .30, .40], ['PHX', .20, .80],
+    ['DFW', .44, .74], ['IAH', .51, .90], ['ORD', .60, .26], ['ATL', .70, .66], ['CLT', .79, .52],
+    ['MCO', .83, .90], ['JFK', .92, .28], ['BOS', .97, .12], ['MSP', .48, .12],
+  ];
+  let W = 0, H = 0, dpr = 1;
+  const pts = () => AIRPORTS.map(([code, x, y]) => ({ code, x: x * W, y: y * H }));
+  let P = [];
+  const pulse = new Map(); // code -> start time of arrival pulse
+
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = band.clientWidth; H = band.clientHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    P = pts();
+    if (reduce.matches) drawStill();
+  }
+
+  const quad = (a, c, b, t) => ({
+    x: (1 - t) * (1 - t) * a.x + 2 * (1 - t) * t * c.x + t * t * b.x,
+    y: (1 - t) * (1 - t) * a.y + 2 * (1 - t) * t * c.y + t * t * b.y,
+  });
+
+  function makeRoute(now) {
+    let i = Math.floor(Math.random() * P.length), j;
+    do { j = Math.floor(Math.random() * P.length); } while (j === i || Math.hypot(P[i].x - P[j].x, P[i].y - P[j].y) < W * .22);
+    const a = P[i], b = P[j];
+    const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2, dx = b.x - a.x, dy = b.y - a.y;
+    const bend = .22 * (dx > 0 ? -1 : 1);
+    const c = { x: mx - dy * bend, y: my + dx * bend };
+    const len = Math.hypot(dx, dy);
+    return { a, b, c, t0: now, fly: 3200 + len * 5, hold: 1400, fade: 1600 };
+  }
+
+  function plane(x, y, ang, alpha) {
+    ctx.save(); ctx.translate(x, y); ctx.rotate(ang); ctx.globalAlpha = alpha;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.beginPath();
+    ctx.moveTo(11, 0); ctx.lineTo(5, -1.6); ctx.lineTo(1, -1.6); ctx.lineTo(-4, -9); ctx.lineTo(-6.5, -9);
+    ctx.lineTo(-3, -1.6); ctx.lineTo(-8, -1.6); ctx.lineTo(-10, -4.5); ctx.lineTo(-11.5, -4.5); ctx.lineTo(-10, 0);
+    ctx.lineTo(-11.5, 4.5); ctx.lineTo(-10, 4.5); ctx.lineTo(-8, 1.6); ctx.lineTo(-3, 1.6); ctx.lineTo(-6.5, 9);
+    ctx.lineTo(-4, 9); ctx.lineTo(1, 1.6); ctx.lineTo(5, 1.6); ctx.closePath(); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawRoute(r, t, alpha) {
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 1.6; ctx.setLineDash([6, 8]); ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(r.a.x, r.a.y);
+    const steps = Math.max(2, Math.ceil(60 * t));
+    for (let k = 1; k <= steps; k++) { const q = quad(r.a, r.c, r.b, (k / steps) * t); ctx.lineTo(q.x, q.y); }
+    ctx.stroke(); ctx.restore();
+  }
+
+  function drawAirports(now) {
+    ctx.save();
+    ctx.font = '600 10px -apple-system, "Segoe UI", Roboto, sans-serif';
+    ctx.textAlign = 'center';
+    for (const p of P) {
+      const s = pulse.get(p.code);
+      if (s !== undefined) {
+        const k = (now - s) / 1800;
+        if (k >= 1) pulse.delete(p.code);
+        else {
+          ctx.globalAlpha = .45 * (1 - k); ctx.strokeStyle = '#FFFFFF'; ctx.lineWidth = 1.5;
+          ctx.beginPath(); ctx.arc(p.x, p.y, 4 + 22 * k, 0, Math.PI * 2); ctx.stroke();
+        }
+      }
+      const lit = s !== undefined;
+      ctx.globalAlpha = lit ? .9 : .38; ctx.fillStyle = '#FFFFFF';
+      ctx.beginPath(); ctx.arc(p.x, p.y, lit ? 3.4 : 2.6, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = lit ? .7 : .26;
+      ctx.fillText(p.code, p.x, p.y + 16);
+    }
+    ctx.restore();
+  }
+
+  let routes = [], nextSpawn = 0, raf = 0;
+  function frame(now) {
+    ctx.clearRect(0, 0, W, H);
+    if (now >= nextSpawn && routes.length < 3) { routes.push(makeRoute(now)); nextSpawn = now + 1500 + Math.random() * 1400; }
+    routes = routes.filter((r) => {
+      const e = now - r.t0;
+      if (e > r.fly + r.hold + r.fade) return false;
+      const t = Math.min(1, e / r.fly);
+      const ease = t < .5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+      const fadeK = e > r.fly + r.hold ? 1 - (e - r.fly - r.hold) / r.fade : 1;
+      drawRoute(r, ease, .34 * fadeK);
+      if (t < 1) {
+        const p = quad(r.a, r.c, r.b, ease), p2 = quad(r.a, r.c, r.b, Math.min(1, ease + .01));
+        plane(p.x, p.y, Math.atan2(p2.y - p.y, p2.x - p.x), .85);
+      } else if (!r.landed) { r.landed = true; pulse.set(r.b.code, now); }
+      return true;
+    });
+    drawAirports(now);
+    raf = requestAnimationFrame(frame);
+  }
+
+  function drawStill() {
+    ctx.clearRect(0, 0, W, H);
+    const byCode = Object.fromEntries(P.map((p) => [p.code, p]));
+    for (const [x, y] of [['LAX', 'DFW'], ['DFW', 'MCO'], ['ORD', 'JFK']]) {
+      const r = makeRoute(0); r.a = byCode[x]; r.b = byCode[y];
+      const dx = r.b.x - r.a.x, dy = r.b.y - r.a.y, bend = .22 * (dx > 0 ? -1 : 1);
+      r.c = { x: (r.a.x + r.b.x) / 2 - dy * bend, y: (r.a.y + r.b.y) / 2 + dx * bend };
+      drawRoute(r, 1, .38);
+    }
+    drawAirports(0);
+  }
+
+  function start() {
+    cancelAnimationFrame(raf);
+    resize();
+    if (reduce.matches) return;
+    routes = []; nextSpawn = 0;
+    raf = requestAnimationFrame(frame);
+  }
+  new ResizeObserver(() => { resize(); }).observe(band);
+  reduce.addEventListener?.('change', start);
+  start();
+})();
+</script>
 </body>
 </html>
