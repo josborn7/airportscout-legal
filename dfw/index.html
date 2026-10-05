@@ -160,6 +160,8 @@ footer { border-top: 1px solid var(--hair); padding-block: 26px 40px; color: var
 
 /* ── word states: Closed / Unavailable / still checking (never a number) ── */
 .big.word { font-size: clamp(44px, 9vw, 96px); letter-spacing: -.02em; color: var(--muted); padding-block: .35em .25em; }
+/* two-column hero: keep the word inside the text column, clear of the diagram */
+@media (min-width: 861px) { .big.word { font-size: min(7.2vw, 84px); } }
 .big.word .unit, .big.word #heroOdo { display: none; }
 .big .w { display: none; } .big.word .w { display: inline; }
 .row .num.word { font: 800 20px/1 var(--display); letter-spacing: 0; color: var(--muted); }
