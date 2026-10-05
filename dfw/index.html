@@ -1,0 +1,905 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>DFW Security Wait Times Right Now | AirportScout</title>
+<meta name="description" content="Live DFW Airport security wait times by terminal for TSA Standard and TSA PreCheck, as posted by DFW Airport. See the shortest line right now. Free on iPhone.">
+<link rel="canonical" href="https://airportscout.app/dfw/">
+<meta name="apple-itunes-app" content="app-id=6792927636">
+<meta name="theme-color" content="#040a16">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://afjlfgyzaswdaruihozn.supabase.co; base-uri 'none'; form-action 'none'">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="apple-touch-icon" href="/assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AirportScout">
+<meta property="og:title" content="DFW security wait times, live by terminal">
+<meta property="og:description" content="The shortest security line at DFW right now, by terminal, as posted by DFW Airport. TSA Standard and TSA PreCheck.">
+<meta property="og:url" content="https://airportscout.app/dfw/">
+<meta property="og:image" content="https://airportscout.app/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<style>
+/* Layout: a night airfield chart. Left = the answer (one rolling number). Right = DFW's five
+   horseshoe terminals as a live diagram. Below = a board of terminal conveyor belts.
+   Single committed look (the 1.2.0 store slides' night style), so no light theme. */
+:root {
+  color-scheme: dark;
+  --n0: #040a16; --n1: #06142c; --n2: #0a2754; --n3: #0d3a7a;
+  --ink: #eef4ff; --muted: #8fa6cc; --faint: #5d7299;
+  --hair: rgba(160,190,255,.14); --glass: rgba(140,175,255,.06);
+  --blue: #0071e3; --blue-hi: #4da3ff; --live: #34c759;
+  --g: #30d158; --y: #ffcc00; --o: #ff9500; --r: #ff3b30;
+  --band: #30d158;
+  --display: "Nunito", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--n0); color: var(--ink); font: 16px/1.5 var(--body); overflow-x: hidden; }
+h1, h2, h3, p, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--blue-hi); outline-offset: 3px; border-radius: 8px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 32px); }
+.eyebrow { font: 700 12px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h2 { font: 900 clamp(26px, 3.6vw, 40px)/1.08 var(--display); letter-spacing: -.02em; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 56ch; }
+
+/* ── odometer ── */
+.odo { display: inline-flex; height: 1em; line-height: 1; overflow: hidden; }
+.odo .col { width: .6em; height: 1em; overflow: hidden; transition: width .5s cubic-bezier(.2,.9,.2,1), opacity .4s; }
+.odo .col.off { width: 0; opacity: 0; }
+.odo .strip { display: flex; flex-direction: column; transition: transform 1.1s cubic-bezier(.2,.9,.2,1); }
+.odo .strip span { height: 1em; display: flex; align-items: center; justify-content: center; }
+
+/* ── top bar + sticky bar ── */
+.top { position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding-block: 18px; }
+.mark { font: 900 19px/1 var(--display); letter-spacing: -.01em; text-decoration: none; }
+.mark b { color: var(--blue-hi); font-weight: 900; }
+.top .sp { flex: 1; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 800 15px/1 var(--display); text-decoration: none; border-radius: 99px; padding: 13px 20px; white-space: nowrap; transition: transform .2s, background-color .2s; }
+.btn:hover { transform: translateY(-1px); }
+.btn.primary { background: var(--blue); color: #fff; }
+.btn.primary:hover { background: #0a84ff; }
+.btn.small { padding: 9px 14px; font-size: 13px; }
+.sticky { position: fixed; z-index: 20; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(5,13,30,.82); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--hair); transform: translateY(-110%); transition: transform .45s cubic-bezier(.2,.9,.2,1); }
+.sticky.on { transform: none; }
+.sticky .wrap { display: flex; align-items: center; gap: 12px; padding-block: 9px; }
+.sticky .now { display: flex; align-items: baseline; gap: 6px; font: 700 14px/1 var(--body); color: var(--muted); min-width: 0; white-space: nowrap; }
+.sticky .now .n { font: 900 22px/1 var(--display); color: var(--band); transition: color .8s; }
+.dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--live); display: inline-block; flex: none; }
+.dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--live); }
+
+/* ── hero ── */
+.hero { position: relative; overflow: hidden; isolation: isolate; padding-bottom: 28px; }
+.night { position: absolute; inset: 0; z-index: -3; background: radial-gradient(ellipse 90% 70% at 68% 46%, var(--n3) 0%, var(--n2) 34%, var(--n1) 68%, var(--n0) 100%); }
+.wash { position: absolute; z-index: -2; left: -8%; top: 22%; width: 56%; height: 52%; border-radius: 50%; background-color: var(--band); opacity: .13; filter: blur(90px); transition: background-color 1.1s; }
+.wm { position: absolute; z-index: -1; left: -1.5vw; bottom: -6vw; font: 900 clamp(200px, 36vw, 540px)/.8 var(--display); letter-spacing: -.05em; color: rgba(190,215,255,.035); -webkit-text-stroke: 1px rgba(190,215,255,.07); user-select: none; pointer-events: none; white-space: nowrap; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: center; }
+.copy { display: flex; flex-direction: column; gap: 14px; padding-block: 8px 20px; min-width: 0; }
+.copy .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.livepill { display: inline-flex; align-items: center; gap: 7px; color: #7dffa0; font-weight: 800; }
+h1 { font: 900 clamp(30px, 4.2vw, 46px)/1.04 var(--display); letter-spacing: -.02em; text-wrap: balance; }
+.answer { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.kicker { font: 800 15px/1.2 var(--display); color: var(--muted); }
+.big { display: flex; align-items: flex-end; gap: .06em; font: 900 clamp(128px, 21vw, 224px)/1 var(--display); letter-spacing: -.04em; color: var(--band); transition: color .9s; margin-left: -.03em; }
+.big .unit { font-size: .2em; letter-spacing: 0; color: var(--muted); padding-bottom: .62em; font-weight: 800; }
+.where { font: 800 clamp(18px, 2.2vw, 22px)/1.25 var(--display); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.where span { color: var(--muted); }
+.link { font: 700 13px/1 var(--body); color: var(--blue-hi); text-decoration: underline; text-underline-offset: 3px; padding: 6px 0; }
+.seg { display: inline-flex; align-self: flex-start; padding: 4px; border-radius: 99px; background: var(--glass); border: 1px solid var(--hair); margin-top: 6px; }
+.seg button { font: 800 14px/1 var(--display); color: var(--muted); padding: 10px 16px; border-radius: 99px; transition: background-color .3s, color .3s; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: #06142c; }
+.src { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.src b { color: var(--ink); font-weight: 700; }
+.face { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; font: 800 9px/1 var(--body); color: #fff; letter-spacing: .02em; border: 2px solid rgba(255,255,255,.9); }
+.face.g { background: var(--live); } .face.b { background: var(--blue); } .face.s { background: #636366; }
+.person { position: relative; width: 14px; height: 15px; }
+.person::before { content: ""; position: absolute; left: 4px; top: 0; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.person::after { content: ""; position: absolute; left: 1px; bottom: 0; width: 12px; height: 7px; border-radius: 7px 7px 2px 2px; background: #fff; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 8px; }
+.pill { font: 700 13px/1 var(--body); color: var(--muted); border: 1px solid var(--hair); border-radius: 99px; padding: 10px 14px; }
+.stage { position: relative; width: 100%; aspect-ratio: 600 / 760; max-height: 700px; justify-self: center; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent); mask-composite: intersect; }
+.replay { position: absolute; right: 0; bottom: 0; font: 700 12px/1 var(--body); color: var(--muted); border: 1px solid var(--hair); border-radius: 99px; padding: 8px 12px; background: rgba(5,13,30,.5); }
+.replay:hover { color: var(--ink); }
+
+/* ── sections ── */
+section.block { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--hair); }
+.head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+
+/* board */
+.board { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: 46px minmax(120px, 190px) minmax(0, 1fr) auto; grid-template-areas: "b m belt n"; align-items: center; gap: 16px; width: 100%; text-align: left; padding: 14px 18px; border-radius: 20px; background: var(--glass); border: 1px solid var(--hair); transition: border-color .3s, background-color .3s, transform .3s; }
+.row:hover { transform: translateX(3px); background: rgba(140,175,255,.1); }
+.row[aria-pressed="true"] { border-color: var(--blue-hi); background: rgba(0,113,227,.16); }
+.row .badge { grid-area: b; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font: 900 24px/1 var(--display); background: rgba(255,255,255,.08); color: var(--ink); }
+.row .meta { grid-area: m; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.row .meta b { font: 800 17px/1.2 var(--display); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.row .meta small { font-size: 12.5px; color: var(--muted); }
+.tag { font: 800 10px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: #06142c; background: var(--g); border-radius: 99px; padding: 4px 7px; }
+.tag.yours { background: var(--blue-hi); }
+.row canvas { grid-area: belt; width: 100%; height: 32px; display: block; }
+.row .num { grid-area: n; display: flex; align-items: flex-end; gap: 5px; font: 900 40px/1 var(--display); letter-spacing: -.03em; min-width: 92px; justify-content: flex-end; transition: color .8s; }
+.row .num em { font: 700 13px/1 var(--body); letter-spacing: 0; color: var(--muted); padding-bottom: 6px; font-style: normal; }
+.tip { margin-top: 18px; display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 20px; border: 1px dashed rgba(160,190,255,.3); color: var(--muted); font-size: 14.5px; }
+.tip b { color: var(--ink); }
+.tip .loop { flex: none; width: 34px; height: 22px; margin-top: 2px; border: 2px dashed #7fd0ff; border-radius: 12px; }
+
+/* three sources */
+.flow-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: 32px; align-items: center; }
+.fv { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(60px, 10vw, 130px); align-items: center; padding-block: 8px; }
+.fv canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.srcs { display: flex; flex-direction: column; gap: 14px; position: relative; }
+.srcs li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--glass); border: 1px solid var(--hair); }
+.srcs b { display: block; font: 800 15px/1.2 var(--display); }
+.srcs small { color: var(--muted); font-size: 12.5px; }
+.one { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 22px 26px; border-radius: 26px; background: rgba(4,10,22,.72); border: 1px solid var(--hair); }
+.one .n { display: flex; align-items: flex-end; gap: 4px; font: 900 76px/1 var(--display); letter-spacing: -.04em; color: var(--band); transition: color .9s; }
+.one .n em { font: 800 16px/1 var(--display); color: var(--muted); font-style: normal; padding-bottom: 12px; }
+.one small { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.also { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 34px; }
+.also li { padding: 16px 18px; border-top: 2px solid var(--blue-hi); background: linear-gradient(180deg, rgba(0,113,227,.12), rgba(0,113,227,0)); }
+.also b { display: block; font: 800 16px/1.25 var(--display); margin-bottom: 4px; }
+.also span { color: var(--muted); font-size: 14px; }
+
+/* closing */
+.close { text-align: left; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+.close h2 { font-size: clamp(34px, 6.2vw, 76px); max-width: 14ch; }
+.close h2 span { display: inline-block; }
+footer { border-top: 1px solid var(--hair); padding-block: 26px 40px; color: var(--faint); font-size: 12.5px; display: flex; flex-direction: column; gap: 6px; }
+
+/* ── word states: Closed / Unavailable / still checking (never a number) ── */
+.big.word { font-size: clamp(44px, 9vw, 96px); letter-spacing: -.02em; color: var(--muted); padding-block: .35em .25em; }
+.big.word .unit, .big.word #heroOdo { display: none; }
+.big .w { display: none; } .big.word .w { display: inline; }
+.row .num.word { font: 800 20px/1 var(--display); letter-spacing: 0; color: var(--muted); }
+.row .num.word em, .row .num.word .o { display: none; }
+.row .num .w { display: none; } .row .num.word .w { display: inline; }
+.livepill.off { display: none; }
+.sticky .now.word .n, .sticky .now.word .u { display: none; }
+.sticky .now.off .dot { display: none; }
+.one .n.word em, .one .n.word #flowOdo { display: none; }
+.one .n .w { display: none; } .one .n.word .w { display: inline; color: var(--muted); }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+footer a { color: var(--muted); }
+
+/* ── motion ── */
+@media (prefers-reduced-motion: no-preference) {
+  .dot::after { animation: ping 1.8s ease-out infinite; }
+  @keyframes ping { from { transform: scale(1); opacity: .7; } to { transform: scale(3.2); opacity: 0; } }
+  .intro .rise { animation: rise .85s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 90ms + 150ms); }
+  @keyframes rise { from { opacity: 0; transform: translateY(20px); } }
+  .intro .wm { animation: wm 2.2s cubic-bezier(.2,.8,.2,1) both; }
+  @keyframes wm { from { opacity: 0; letter-spacing: .28em; transform: translateX(6%); } }
+  .close.play h2 span { animation: rise .8s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i) * 70ms); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .odo .strip, .odo .col, .big, .wash, .row, .row .num, .sticky, .sticky .now .n, .one .n, .btn { transition: none; }
+}
+
+/* ── narrow ── */
+@media (max-width: 860px) {
+  .hero-grid, .flow-grid { grid-template-columns: minmax(0, 1fr); }
+  .stage { max-width: 520px; }
+  .also { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 640px) {
+  .top .mark-hide { display: none; }
+  .sticky .mark { display: none; }
+  .row { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: "b m n" "belt belt belt"; gap: 10px 12px; padding: 12px 14px; }
+  .row .badge { width: 40px; height: 40px; font-size: 21px; border-radius: 12px; }
+  .row .num { font-size: 34px; min-width: 0; }
+  .row .num.word { font-size: 18px; }
+  .fv { grid-template-columns: minmax(0, 1fr); gap: 84px; justify-items: center; }
+  .srcs { flex-direction: row; gap: 8px; width: 100%; }
+  .srcs li { flex: 1 1 0; min-width: 0; flex-direction: column; text-align: center; padding: 10px 6px; gap: 6px; }
+  .srcs b { font-size: 12.5px; } .srcs small { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="sticky" id="sticky" aria-hidden="true">
+  <div class="wrap">
+    <a class="mark" href="#top">Airport<b>Scout</b></a>
+    <div class="now word off" id="stNow"><span class="dot"></span><span id="stWhere">DFW</span><span class="n" id="stOdo"></span><span class="u">min</span></div>
+    <span style="flex:1"></span>
+    <a class="btn primary small" href="https://apps.apple.com/app/id6792927636" tabindex="-1">Get the app</a>
+  </div>
+</div>
+
+<section class="hero intro" id="top">
+  <div class="night"></div><div class="wash"></div><div class="wm" aria-hidden="true">DFW</div>
+  <div class="wrap">
+    <div class="top">
+      <a class="mark" href="#top">Airport<b>Scout</b></a>
+      <span class="sp"></span>
+      <a class="btn primary small mark-hide" href="https://apps.apple.com/app/id6792927636">Get the app</a>
+    </div>
+    <div class="hero-grid">
+      <div class="copy">
+        <p class="eyebrow rise" style="--i:0"><span class="livepill off" id="livepill"><span class="dot"></span>Live</span>Dallas Fort Worth International</p>
+        <h1 class="rise" style="--i:1">DFW security wait times</h1>
+        <div class="answer rise" style="--i:2">
+          <p class="kicker" id="kicker">Shortest line right now</p>
+          <div class="big word" id="big"><span id="heroOdo"></span><span class="unit">min</span><span class="w" id="heroWord" aria-live="polite">&nbsp;</span></div>
+          <p class="where"><b id="whereT">Checking DFW's posted times</b><span id="whereL"></span><button class="link" id="unpick" hidden>Show the shortest line</button></p>
+        </div>
+        <div class="seg rise" style="--i:3" role="group" aria-label="Lane">
+          <button data-lane="std" aria-pressed="true">Standard</button>
+          <button data-lane="pre" aria-pressed="false">TSA PreCheck</button>
+        </div>
+        <p class="src rise" style="--i:4"><span class="face g">DFW</span><span><b>DFW official checkpoint times</b><span id="age"></span></span></p>
+        <div class="cta rise" style="--i:5">
+          <a class="btn primary" href="https://apps.apple.com/app/id6792927636">Get AirportScout for iPhone</a>
+          <span class="pill">Android coming soon</span>
+        </div>
+        <noscript><p class="lede">Live wait times need JavaScript. The AirportScout app shows them too.</p></noscript>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="field" role="img" aria-label="Diagram of DFW's five terminals, each coloured by its current security wait"></canvas>
+        <button class="replay" id="replay">Replay intro</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="boardSec">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow">Every terminal, right now</p>
+      <h2>Pick your terminal. Watch the line move.</h2>
+      <p class="lede">Each belt runs at the speed of that line. More bins and a slower crawl mean a longer wait.</p>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="tip"><span class="loop" aria-hidden="true"></span><p><b>Skylink connects all five terminals past security.</b> Many travelers clear at the shortest line, then ride to their gate.</p></div>
+  </div>
+</section>
+
+<section class="block" id="flowSec">
+  <div class="wrap">
+    <div class="flow-grid">
+      <div class="head" style="margin:0">
+        <p class="eyebrow">In the app</p>
+        <h2>Three sources. One number.</h2>
+        <p class="lede">This page shows what DFW posts. The app blends it with reports from travelers standing in line, and covers 300+ US airports with TSA estimates.</p>
+      </div>
+      <div class="fv" id="fv">
+        <canvas id="flowc" aria-hidden="true"></canvas>
+        <ul class="srcs">
+          <li><span class="face g">DFW</span><div><b>Airport official</b><small>DFW, Houston and Orlando</small></div></li>
+          <li><span class="face b"><span class="person"></span></span><div><b>Traveler reports</b><small>from people in line now</small></div></li>
+          <li><span class="face s">TSA</span><div><b>TSA estimates</b><small>at 300+ US airports</small></div></li>
+        </ul>
+        <div class="one" id="one"><div class="n word" id="flowN"><span id="flowOdo"></span><em>min</em><span class="w" id="flowWord"></span></div><small>your lane, right now</small></div>
+      </div>
+    </div>
+    <ul class="also">
+      <li><b>Today's trend and forecast</b><span>See how the line moved today and where it is heading.</span></li>
+      <li><b>CLEAR and PreCheck lanes</b><span>Tracked separately, at every checkpoint.</span></li>
+      <li><b>Report in a few taps</b><span>Tell the next traveler what you see.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap close" id="close">
+    <h2 id="closeH">Never guess the security line again.</h2>
+    <div class="cta">
+      <a class="btn primary" href="https://apps.apple.com/app/id6792927636">Get AirportScout for iPhone</a>
+      <span class="pill">Android coming soon</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span>Wait times as posted by DFW Airport.</span>
+    <span>Not affiliated with or endorsed by the TSA or DHS.</span>
+    <nav><a href="/">Home</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Service</a><a href="/support/">Support</a></nav>
+  </footer>
+</div>
+
+<script id="dfw-model">
+/* Pure data rules for this page: no DOM, no network, no clock of its own.
+   Everything the endpoint sends is checked here before any of it is shown. */
+const DFWModel = (() => {
+  const PROD_API = 'https://afjlfgyzaswdaruihozn.supabase.co/functions/v1/official-waits-public?airport=DFW';
+  const TERMINALS = ['A', 'B', 'C', 'D', 'E'];
+  const STALE_AFTER_MS = 180000;
+  const REFRESH_MS = 60000;
+  const isObj = x => x !== null && typeof x === 'object';
+
+  /* One lane: a number only when DFW posts it open with a whole number of minutes from 0 to 600. */
+  function lane(x) {
+    if (isObj(x) && x.status === 'open' && Number.isInteger(x.minutes) && x.minutes >= 0 && x.minutes <= 600) {
+      return { status: 'open', minutes: x.minutes };
+    }
+    if (isObj(x) && x.status === 'closed') {
+      const ms = typeof x.closed_since === 'string' ? Date.parse(x.closed_since) : NaN;
+      return { status: 'closed', closedSince: Number.isFinite(ms) ? ms : null };
+    }
+    return { status: 'unavailable' };
+  }
+
+  function normalize(payload) {
+    if (!isObj(payload) || payload.airport !== 'DFW' || payload.status !== 'ok' || !Array.isArray(payload.terminals)) return { ok: false };
+    const generatedAt = typeof payload.generated_at === 'string' ? Date.parse(payload.generated_at) : NaN;
+    if (!Number.isFinite(generatedAt)) return { ok: false };
+    const lanes = {}, seen = {};
+    TERMINALS.forEach(id => { lanes[id] = { std: { status: 'unavailable' }, pre: { status: 'unavailable' } }; });
+    let any = false;
+    for (const e of payload.terminals) {
+      if (!isObj(e) || typeof e.terminal !== 'string' || !TERMINALS.includes(e.terminal) || seen[e.terminal]) continue;
+      seen[e.terminal] = true;
+      const std = lane(e.standard), pre = lane(e.precheck);
+      lanes[e.terminal] = { std, pre };
+      if (std.status !== 'unavailable' || pre.status !== 'unavailable') any = true;
+    }
+    if (!any) return { ok: false };
+    const up = typeof payload.updated_at === 'string' ? Date.parse(payload.updated_at) : NaN;
+    return { ok: true, updatedAt: Number.isFinite(up) ? up : null, generatedAt, lanes };
+  }
+
+  /* What the hero shows. Shortest = the lowest minutes among open terminals for the lane (ties: A before B ...). */
+  function view(model, laneKey, pick) {
+    const out = { mode: 'loading', terminal: null, minutes: null, shortest: null, closedSince: null };
+    if (model == null) return out;
+    if (!model.ok) { out.mode = 'feed_down'; return out; }
+    const key = laneKey === 'pre' ? 'pre' : 'std';
+    let anyClosed = false;
+    for (const id of TERMINALS) {
+      const l = model.lanes[id][key];
+      if (l.status === 'closed') anyClosed = true;
+      if (l.status === 'open' && (out.shortest === null || l.minutes < model.lanes[out.shortest][key].minutes)) out.shortest = id;
+    }
+    if (TERMINALS.includes(pick)) {
+      const l = model.lanes[pick][key];
+      out.terminal = pick;
+      if (l.status === 'open') { out.mode = 'number'; out.minutes = l.minutes; }
+      else if (l.status === 'closed') { out.mode = 'closed'; out.closedSince = l.closedSince; }
+      else out.mode = 'unavailable';
+      return out;
+    }
+    if (out.shortest !== null) {
+      out.mode = 'number'; out.terminal = out.shortest; out.minutes = model.lanes[out.shortest][key].minutes;
+    } else {
+      out.mode = anyClosed ? 'closed' : 'unavailable';
+    }
+    return out;
+  }
+
+  function ageText(sec) {
+    if (!Number.isFinite(sec) || sec < 0) return '';
+    if (sec < 50) return 'just now';
+    if (sec < 3600) return Math.round(sec / 60) + 'm ago';
+    return Math.floor(sec / 3600) + 'h ago';
+  }
+
+  /* Close time on DFW's own clock (Central), whatever the visitor's time zone is. */
+  function closedText(ms) {
+    if (ms == null || !Number.isFinite(ms)) return 'Closed';
+    try {
+      const t = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', hour: 'numeric', minute: '2-digit' }).format(ms);
+      return 'Closed at ' + t.replace(/[  ]/g, ' ');
+    } catch (e) {
+      return 'Closed';
+    }
+  }
+
+  function isStale(lastGoodAt, now) {
+    return lastGoodAt == null || now - lastGoodAt > STALE_AFTER_MS;
+  }
+
+  /* Preview switch. Only a local or home-network host may point the page at the preview
+     server's test data; on the real site the answer is always the real endpoint. */
+  const DEV_HOST = /^(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/;
+  const DEV_PATH = /^\/__(fixture\/[a-z_]+\.json|fixture\/error|live)$/;
+  function pickApi(hostname, search) {
+    if (!DEV_HOST.test(String(hostname || ''))) return PROD_API;
+    let api = null;
+    try { api = new URLSearchParams(String(search || '')).get('api'); } catch (e) { api = null; }
+    return typeof api === 'string' && DEV_PATH.test(api) ? api : PROD_API;
+  }
+
+  return { PROD_API, TERMINALS, STALE_AFTER_MS, REFRESH_MS, normalize, view, ageText, closedText, isStale, pickApi };
+})();
+</script>
+
+<script>
+(() => {
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const $ = s => document.querySelector(s);
+  const BANDS = [
+    { max: 9, c: [48, 209, 88], css: 'var(--g)', word: 'Short' },
+    { max: 19, c: [255, 204, 0], css: 'var(--y)', word: 'Moderate' },
+    { max: 34, c: [255, 149, 0], css: 'var(--o)', word: 'Busy' },
+    { max: 1e9, c: [255, 59, 48], css: 'var(--r)', word: 'Long' },
+  ];
+  const band = v => BANDS.find(b => v <= b.max);
+  const rgb = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+  const PI = Math.PI;
+  const MUTED = [143, 166, 204], MUTED_CSS = '#8fa6cc', NO_READING = [120, 135, 165];
+
+  /* ── odometer ── */
+  function odo(el) {
+    el.classList.add('odo');
+    const cols = [0, 1].map(() => {
+      const col = document.createElement('span'); col.className = 'col'; col.setAttribute('aria-hidden', 'true');
+      const strip = document.createElement('span'); strip.className = 'strip';
+      for (let d = 0; d < 10; d++) { const s = document.createElement('span'); s.textContent = d; strip.appendChild(s); }
+      col.appendChild(strip); el.appendChild(col); return { col, strip };
+    });
+    return v => {
+      const real = Math.max(0, Math.round(v));
+      v = clamp(real, 0, 99);
+      const t = Math.floor(v / 10), o = v % 10;
+      cols[0].col.classList.toggle('off', t === 0);
+      cols[0].strip.style.transform = `translateY(-${t}em)`;
+      cols[1].strip.style.transform = `translateY(-${o}em)`;
+      el.setAttribute('aria-label', real); el.setAttribute('role', 'img');
+    };
+  }
+  const unitOf = v => (v > 99 ? 'min+' : 'min');
+  const put = (el, s) => { if (el.textContent !== s) el.textContent = s; };
+
+  /* ── data: geometry only. Every wait comes from DFW's feed through DFWModel. ── */
+  const T = [
+    { id: 'A', side: 1, y: 150 },
+    { id: 'B', side: -1, y: 150 },
+    { id: 'C', side: 1, y: 380 },
+    { id: 'D', side: -1, y: 380 },
+    { id: 'E', side: 1, y: 610 },
+  ];
+  T.forEach(t => { t.col = [255, 255, 255]; t.parts = []; t.pulse = 0; t.phase = Math.random(); t.cross = 8; });
+  const state = { lane: 'std', pick: null, model: null, lastGoodAt: null, recvPerf: 0, failed: false };
+  const stale = () => DFWModel.isStale(state.lastGoodAt, Date.now());
+  const ln = t => (state.model && state.model.ok && !stale()) ? state.model.lanes[t.id][state.lane] : { status: 'unavailable' };
+  const val = t => { const l = ln(t); return l.status === 'open' ? l.minutes : null; };
+  const vw = () => DFWModel.view(state.failed || (state.model && stale()) ? { ok: false } : state.model, state.lane, state.pick);
+  const LOADING = DFWModel.view(null, 'std', null);
+  let cur = vw();
+
+  /* ── board rows ── */
+  const board = $('#board');
+  T.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'row'; b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = `<span class="badge">${t.id}</span>
+      <span class="meta"><b><span>Terminal ${t.id}</span><i class="tag" hidden>Shortest</i></b><small>DFW official</small></span>
+      <canvas aria-hidden="true"></canvas>
+      <span class="num word"><span class="o"></span><em>min</em><span class="w">—</span></span>`;
+    b.addEventListener('click', () => { state.pick = state.pick === t.id ? null : t.id; render(); });
+    board.appendChild(b);
+    t.row = b; t.tag = b.querySelector('.tag'); t.num = b.querySelector('.num'); t.setNum = odo(b.querySelector('.o'));
+    t.word = b.querySelector('.w'); t.unit = b.querySelector('em'); t.small = b.querySelector('small');
+    t.belt = b.querySelector('canvas'); t.bctx = t.belt.getContext('2d');
+  });
+
+  const setHero = odo($('#heroOdo')), setSticky = odo($('#stOdo')), setFlow = odo($('#flowOdo'));
+  const big = $('#big'), heroUnit = $('#big .unit'), stNow = $('#stNow'), stUnit = $('#stNow .u'), flowN = $('#flowN'), flowUnit = $('#flowN em');
+  const ageSec = () => (state.model.generatedAt - state.model.updatedAt) / 1000 + (performance.now() - state.recvPerf) / 1000;
+  let introHold = !RM;
+
+  function render() {
+    const v = cur = vw();
+    const feedOk = v.mode === 'number' || v.mode === 'closed' || v.mode === 'unavailable';
+    const laneName = state.lane === 'std' ? 'TSA Standard' : 'TSA PreCheck';
+
+    /* hero: while the intro is still playing it stays in the checking state, then the number rolls up from 0 */
+    const hv = introHold && v.mode === 'number' ? LOADING : v;
+    const picked = state.pick !== null && hv.terminal === state.pick;
+    let kicker = 'Shortest line right now', word = ' ', whereT = "Checking DFW's posted times", whereL = '', bandCss = MUTED_CSS;
+    if (hv.mode === 'number') {
+      kicker = picked ? 'Your terminal right now' : 'Shortest line right now';
+      whereT = 'Terminal ' + hv.terminal; whereL = laneName; bandCss = rgb(band(hv.minutes).c);
+    } else if (hv.mode === 'closed') {
+      word = 'Closed';
+      if (picked) {
+        const ct = DFWModel.closedText(hv.closedSince);
+        kicker = 'Your terminal right now'; whereT = 'Terminal ' + hv.terminal;
+        whereL = laneName + ' · ' + ct.charAt(0).toLowerCase() + ct.slice(1);
+      } else { kicker = 'DFW security right now'; whereT = 'All terminals'; whereL = 'No ' + laneName + ' lane is open'; }
+    } else if (hv.mode === 'unavailable') {
+      word = 'Unavailable';
+      if (picked) { kicker = 'Your terminal right now'; whereT = 'Terminal ' + hv.terminal; whereL = laneName + ' · no current reading'; }
+      else { kicker = 'DFW security right now'; whereT = laneName; whereL = 'DFW is not posting times for this lane right now'; }
+    } else if (hv.mode === 'feed_down') {
+      word = 'Unavailable'; kicker = 'DFW security right now';
+      whereT = "DFW's wait times are unavailable right now."; whereL = 'The app still has traveler reports and TSA estimates.';
+    }
+    document.documentElement.style.setProperty('--band', bandCss);
+    put($('#kicker'), kicker); put($('#whereT'), whereT); put($('#whereL'), whereL);
+    if (hv.mode === 'number') {
+      const wasWord = big.classList.contains('word');
+      big.classList.remove('word');
+      if (wasWord && !RM) { setHero(0); void big.offsetWidth; }
+      setHero(hv.minutes); put(heroUnit, unitOf(hv.minutes));
+    } else {
+      big.classList.add('word'); put($('#heroWord'), word);
+    }
+    $('#unpick').hidden = !(picked && state.pick);
+    $('#livepill').classList.toggle('off', !feedOk);
+    const age = feedOk && state.model && state.model.updatedAt !== null ? DFWModel.ageText(ageSec()) : '';
+    put($('#age'), age ? ' · ' + age : v.mode === 'feed_down' ? ' · unavailable' : '');
+
+    /* sticky bar + the app card: a number only in number mode */
+    const isNum = v.mode === 'number';
+    stNow.classList.toggle('word', !isNum); stNow.classList.toggle('off', !feedOk);
+    put($('#stWhere'), isNum ? 'DFW · Terminal ' + v.terminal : v.mode === 'closed' ? 'DFW · Closed' : v.mode === 'loading' ? 'DFW' : 'DFW · Unavailable');
+    flowN.classList.toggle('word', !isNum);
+    if (isNum) { setSticky(v.minutes); put(stUnit, unitOf(v.minutes)); setFlow(v.minutes); put(flowUnit, unitOf(v.minutes)); }
+    else put($('#flowWord'), '—');
+
+    /* board */
+    T.forEach(t => {
+      const l = ln(t), isP = state.pick === t.id, isS = v.shortest === t.id;
+      if (l.status === 'open') {
+        t.num.classList.remove('word'); t.setNum(l.minutes); put(t.unit, unitOf(l.minutes));
+        t.num.style.color = rgb(band(l.minutes).c);
+        put(t.small, 'DFW official');
+        t.row.setAttribute('aria-label', `Terminal ${t.id}, ${l.minutes} minutes`);
+      } else {
+        t.num.classList.add('word'); t.num.style.color = '';
+        if (l.status === 'closed') {
+          put(t.word, 'Closed');
+          put(t.small, l.closedSince === null ? 'DFW official' : DFWModel.closedText(l.closedSince));
+          t.row.setAttribute('aria-label', `Terminal ${t.id}, closed`);
+        } else if (v.mode === 'loading') {
+          put(t.word, '—'); put(t.small, 'DFW official');
+          t.row.setAttribute('aria-label', `Terminal ${t.id}, checking`);
+        } else {
+          put(t.word, '—'); put(t.small, 'Unavailable');
+          t.row.setAttribute('aria-label', `Terminal ${t.id}, unavailable`);
+        }
+      }
+      t.row.setAttribute('aria-pressed', String(isP));
+      t.tag.hidden = !(isS || isP);
+      put(t.tag, isP ? 'Your line' : 'Shortest');
+      t.tag.classList.toggle('yours', isP);
+    });
+    if (RM) drawAll(0);
+  }
+  $('#unpick').addEventListener('click', () => { state.pick = null; render(); });
+  document.querySelectorAll('.seg button').forEach(btn => btn.addEventListener('click', () => {
+    state.lane = btn.dataset.lane;
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
+    render();
+  }));
+
+  /* ── live data: DFW's posted times from the public endpoint, every minute while the tab is visible ── */
+  const API = DFWModel.pickApi(location.hostname, location.search);
+  let busy = false;
+  async function load() {
+    if (busy) return;
+    busy = true;
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+    try {
+      const r = await fetch(API, { signal: ctl.signal, credentials: 'omit', cache: 'no-store' });
+      if (!r.ok) throw new Error('http');
+      const next = DFWModel.normalize(await r.json());
+      const before = T.map(val);
+      state.model = next; state.failed = false; state.recvPerf = performance.now();
+      if (next.ok) state.lastGoodAt = Date.now();
+      T.forEach((t, i) => { const a = val(t); if (a !== null && before[i] !== null && a !== before[i]) t.pulse = 1; });
+    } catch (e) {
+      if (stale()) state.failed = true;   // keep the last good numbers only while they are under 3 minutes old
+    } finally { clearTimeout(to); busy = false; render(); }
+  }
+  setInterval(() => { if (document.visibilityState === 'visible') load(); }, DFWModel.REFRESH_MS);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { render(); load(); } });
+  /* keeps the age text moving and drops the numbers once they are 3 minutes past the last good response */
+  setInterval(render, 5000);
+
+  /* ── canvases ── */
+  const fit = cv => {
+    const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    return { w: r.width, h: r.height, d };
+  };
+
+  /* hero field: DFW from above. Spine = International Parkway; five horseshoe terminals; Skylink loop. */
+  const field = $('#field'), fx = field.getContext('2d');
+  const W = 600, H = 760, R = 84, SX = 300, OFF = 32;
+  T.forEach(t => { t.cx = SX + t.side * OFF; t.cy = t.y; });
+  const arcPt = (t, p, r = R) => { const a = -PI / 2 + t.side * p * PI; return [t.cx + r * Math.cos(a), t.cy + r * Math.sin(a)]; };
+  const sky = (() => {
+    const pts = [], r = R + 14, east = T.filter(t => t.side > 0), west = T.filter(t => t.side < 0).reverse();
+    east.forEach(t => { for (let i = 0; i <= 24; i++) pts.push(arcPt(t, i / 24, r)); });
+    pts.push([SX - OFF, 610 + r]);
+    west.forEach(t => { for (let i = 24; i >= 0; i--) pts.push(arcPt(t, i / 24, r)); });
+    pts.push(pts[0]);
+    const len = [0]; for (let i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    const total = len[len.length - 1];
+    const at = u => {
+      const L = ((u % 1) + 1) % 1 * total; let i = 1; while (len[i] < L) i++;
+      const k = (L - len[i - 1]) / (len[i] - len[i - 1] || 1);
+      return [pts[i - 1][0] + (pts[i][0] - pts[i - 1][0]) * k, pts[i - 1][1] + (pts[i][1] - pts[i - 1][1]) * k];
+    };
+    return { pts, len, total, at };
+  })();
+  const RUNWAYS = [44, 84, 516, 556];
+  const cam = { x: SX, y: H / 2, z: 1, px: 0, py: 0, tx: 0, ty: 0 };
+  let introT0 = performance.now(), streak = null, nextStreak = 2.5;
+
+  $('#stage').addEventListener('pointermove', e => {
+    const r = field.getBoundingClientRect();
+    cam.tx = ((e.clientX - r.left) / r.width - .5) * -14; cam.ty = ((e.clientY - r.top) / r.height - .5) * -14;
+  });
+  $('#stage').addEventListener('pointerleave', () => { cam.tx = cam.ty = 0; });
+
+  function drawField(now, dt) {
+    const { w, h, d } = fit(field), c = fx;
+    const it = RM ? 99 : (now - introT0) / 1000, t = now / 1000;
+    /* focus = the picked terminal, else the shortest open one, else none (overview) */
+    const pk = T.find(x => x.id === state.pick) || null;
+    const f = pk || T.find(x => x.id === cur.shortest && val(x) !== null) || null;
+    const tz = pk ? 1.26 : 1, tcx = pk ? (SX + pk.cx) / 2 : SX, tcy = pk ? (H / 2 + pk.cy * 2) / 3 : H / 2;
+    const k = RM ? 1 : 1 - Math.exp(-dt * 3.2);
+    cam.x += (tcx - cam.x) * k; cam.y += (tcy - cam.y) * k; cam.z += (tz - cam.z) * k;
+    cam.px += (cam.tx - cam.px) * k; cam.py += (cam.ty - cam.py) * k;
+    const s = Math.min(w / W, h / H), z = s * cam.z * (1 + .22 * (1 - ease(it / 2.6)));
+    const lab = Math.max(1, .8 / s);
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    c.translate(w / 2 + cam.px, h / 2 + cam.py); c.scale(z, z); c.translate(-cam.x, -cam.y);
+    c.lineCap = 'round'; c.lineJoin = 'round';
+
+    // chart graticule
+    c.strokeStyle = 'rgba(150,185,255,.05)'; c.lineWidth = 1;
+    for (let x = -80; x <= W + 80; x += 76) { c.beginPath(); c.moveTo(x, -80); c.lineTo(x, H + 80); c.stroke(); }
+    for (let y = -76; y <= H + 80; y += 76) { c.beginPath(); c.moveTo(-80, y); c.lineTo(W + 80, y); c.stroke(); }
+
+    // runways with sequenced edge lights
+    const rp = ease((it - .1) / 1.1);
+    RUNWAYS.forEach((x, i) => {
+      const y0 = 70, y1 = 70 + (H - 140) * rp;
+      c.strokeStyle = 'rgba(150,185,255,.10)'; c.lineWidth = 9; c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y1); c.stroke();
+      c.strokeStyle = 'rgba(210,228,255,.22)'; c.lineWidth = 1; c.setLineDash([10, 12]); c.beginPath(); c.moveTo(x, y0); c.lineTo(x, y1); c.stroke(); c.setLineDash([]);
+      for (let y = y0, n = 0; y <= y1; y += 31, n++) {
+        const wave = .5 + .5 * Math.sin(t * 3.2 - n * .55 * (i % 2 ? 1 : -1) + i);
+        c.fillStyle = `rgba(190,220,255,${.16 + .5 * wave * wave})`;
+        c.fillRect(x - 6.5, y - 1, 2, 2); c.fillRect(x + 4.5, y - 1, 2, 2);
+      }
+    });
+    // an arrival: a light running down a runway
+    if (!RM && it > 2.4) {
+      nextStreak -= dt;
+      if (!streak && nextStreak < 0) { const up = Math.random() < .5; streak = { x: RUNWAYS[Math.floor(Math.random() * 4)], y: up ? H - 60 : 60, v: up ? -330 : 330, a: 1 }; }
+      if (streak) {
+        streak.y += streak.v * dt; if (streak.y < 120 || streak.y > H - 120) streak.a -= dt * 1.6;
+        const g = c.createLinearGradient(0, streak.y, 0, streak.y - Math.sign(streak.v) * 130);
+        g.addColorStop(0, `rgba(255,244,214,${.95 * clamp(streak.a)})`); g.addColorStop(1, 'rgba(255,244,214,0)');
+        c.strokeStyle = g; c.lineWidth = 3; c.beginPath(); c.moveTo(streak.x, streak.y); c.lineTo(streak.x, streak.y - Math.sign(streak.v) * 130); c.stroke();
+        if (streak.a <= 0) { streak = null; nextStreak = 3 + Math.random() * 3; }
+      }
+    }
+
+    // spine (International Parkway) and terminal roadways
+    const sp = ease(it / .9);
+    c.strokeStyle = 'rgba(200,222,255,.26)'; c.lineWidth = 2;
+    [-7, 7].forEach(o => { c.beginPath(); c.moveTo(SX + o, 16); c.lineTo(SX + o, 16 + (H - 32) * sp); c.stroke(); });
+    c.fillStyle = 'rgba(200,222,255,.5)';
+    for (let y = 30; y < 16 + (H - 32) * sp; y += 26) c.fillRect(SX - .75, ((y + t * 18) % (H - 40)) + 20, 1.5, 7);
+
+    // Skylink loop + trains
+    const kp = ease((it - 2) / 1.3), kn = Math.floor(sky.pts.length * kp);
+    if (kn > 1) {
+      c.strokeStyle = 'rgba(127,208,255,.34)'; c.lineWidth = 1.6; c.setLineDash([3, 7]);
+      c.beginPath(); sky.pts.slice(0, kn).forEach((p, i) => (i ? c.lineTo(p[0], p[1]) : c.moveTo(p[0], p[1]))); c.stroke(); c.setLineDash([]);
+    }
+    if (kp >= 1) for (let i = 0; i < 4; i++) {
+      const dir = i % 2 ? 1 : -1, u = dir * t * .034 + i * .25;
+      for (let j = 6; j >= 0; j--) {
+        const p = sky.at(u - dir * j * .0035);
+        c.fillStyle = `rgba(170,228,255,${(1 - j / 7) * .95})`; c.beginPath(); c.arc(p[0], p[1], j ? 2 : 3, 0, PI * 2); c.fill();
+      }
+    }
+
+    // terminals
+    const sweepY = ((t / 7) % 1) * (H + 260) - 130;
+    T.forEach((tm, i) => {
+      const l = ln(tm), open = l.status === 'open', v = open ? l.minutes : null, isF = tm === f;
+      const ap = ease((it - .5 - i * .14) / .8), fl = clamp((it - 1.5 - i * .1) / .5);
+      // a terminal without an open reading is drawn quiet: grey-blue, dim glow, nobody in line
+      const target = (open ? band(v).c : NO_READING).map(x => 255 + (x - 255) * fl), gl = open ? 1 : .35;
+      const kc = RM ? 1 : 1 - Math.exp(-dt * 5);
+      tm.col = tm.col.map((x, j) => x + (target[j] - x) * kc);
+      tm.pulse = Math.max(0, tm.pulse - dt * .9);
+      const near = clamp(1 - Math.abs(sweepY - tm.cy) / 120), dim = isF ? 1 : (state.pick ? .38 : .72);
+      const a0 = -PI / 2, a1 = -PI / 2 + tm.side * ap * PI, ccw = tm.side < 0;
+      if (ap <= 0) return;
+      // inner roadway
+      c.strokeStyle = `rgba(200,222,255,${.16 * ap})`; c.lineWidth = 1.5;
+      c.beginPath(); c.arc(tm.cx - tm.side * OFF * .6, tm.cy, R - 34, a0, a1, ccw); c.stroke();
+      // glow passes, then the concourse
+      c.globalCompositeOperation = 'lighter';
+      [[44, .05], [26, .10], [15, .16]].forEach(([lw, al]) => {
+        c.strokeStyle = rgb(tm.col, al * dim * gl * (1 + near * .9 + tm.pulse * 1.6)); c.lineWidth = lw;
+        c.beginPath(); c.arc(tm.cx, tm.cy, R, a0, a1, ccw); c.stroke();
+      });
+      c.globalCompositeOperation = 'source-over';
+      c.strokeStyle = rgb(tm.col, (.55 + .45 * dim) * (isF ? 1 : .9)); c.lineWidth = 8;
+      c.beginPath(); c.arc(tm.cx, tm.cy, R, a0, a1, ccw); c.stroke();
+      c.strokeStyle = `rgba(255,255,255,${.5 * dim})`; c.lineWidth = 1.2;
+      c.beginPath(); c.arc(tm.cx, tm.cy, R + 2.4, a0, a1, ccw); c.stroke();
+      // travelers: more of them, moving slower, when the wait is longer
+      const want = open ? Math.min(44, Math.round(6 + v * .95)) : 0;
+      while (tm.parts.length < want) tm.parts.push({ p: Math.random(), r: (Math.random() - .5) * 26, v: (.04 + Math.random() * .07) * (Math.random() < .5 ? -1 : 1), s: .8 + Math.random() * 1.2 });
+      tm.parts.length = want;
+      const pa = clamp((it - 1.9) / .6) * dim;
+      c.fillStyle = rgb(tm.col.map(x => x + (255 - x) * .35), .85 * pa);
+      tm.parts.forEach(q => {
+        q.p = (q.p + q.v * dt / (1 + v / 12) + 1) % 1;
+        const p = arcPt(tm, q.p, R - 17 + q.r * .5);
+        c.beginPath(); c.arc(p[0], p[1], q.s, 0, PI * 2); c.fill();
+      });
+      // checkpoints
+      [.2, .5, .8].forEach((cp, j) => {
+        if (ap < cp) return;
+        const p = arcPt(tm, cp), tw = .5 + .5 * Math.sin(t * 2 + j * 2 + i);
+        c.fillStyle = '#06142c'; c.beginPath(); c.arc(p[0], p[1], 4.6, 0, PI * 2); c.fill();
+        c.fillStyle = `rgba(255,255,255,${(.6 + .4 * tw) * dim})`; c.beginPath(); c.arc(p[0], p[1], 2.4, 0, PI * 2); c.fill();
+      });
+      // focus ring
+      if (isF && fl >= 1 && !RM) [0, .5].forEach(o => {
+        const q = ((t / 2.4) + o) % 1;
+        c.strokeStyle = rgb(tm.col, (1 - q) * .5); c.lineWidth = 2;
+        c.beginPath(); c.arc(tm.cx, tm.cy, R + 12 + q * 44, a0, a1, ccw); c.stroke();
+      });
+      // label
+      if (fl > 0) {
+        const lx = tm.cx + tm.side * (R + 46 * Math.min(lab, 1.25)), ly = tm.cy;
+        c.globalAlpha = fl * (.5 + .5 * dim);
+        c.textAlign = 'center'; c.textBaseline = 'middle';
+        c.fillStyle = '#eef4ff'; c.font = `900 ${30 * lab}px Nunito, system-ui, sans-serif`;
+        c.fillText(tm.id, lx, ly - 13 * lab);
+        c.fillStyle = rgb(tm.col); c.font = `800 ${15 * lab}px Nunito, system-ui, sans-serif`;
+        c.fillText(open ? v + ' min' : l.status === 'closed' ? 'Closed' : '—', lx, ly + 12 * lab);
+        c.globalAlpha = 1;
+      }
+    });
+
+    // feed sweep
+    if (!RM && it > 2.6) {
+      const g = c.createLinearGradient(0, sweepY - 70, 0, sweepY + 10);
+      g.addColorStop(0, 'rgba(140,200,255,0)'); g.addColorStop(.85, 'rgba(140,200,255,.07)'); g.addColorStop(1, 'rgba(190,230,255,.22)');
+      c.fillStyle = g; c.fillRect(-60, sweepY - 70, W + 120, 80);
+    }
+    // chart furniture
+    const fa = clamp((it - 2.2) / .8);
+    c.globalAlpha = fa; c.fillStyle = 'rgba(143,166,204,.75)'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.font = `${10.5 * lab}px ui-monospace, Consolas, monospace`;
+    c.fillText('KDFW  32°53′49″N 097°02′17″W', 16, H - 26 * lab);
+    c.fillText('Terminal layout · not to scale', 16, H - 12 * lab);
+    c.strokeStyle = 'rgba(143,166,204,.75)'; c.lineWidth = 1.4;
+    c.beginPath(); c.moveTo(W - 30, 54); c.lineTo(W - 30, 24); c.lineTo(W - 35, 33); c.moveTo(W - 30, 24); c.lineTo(W - 25, 33); c.stroke();
+    c.textAlign = 'center'; c.fillText('N', W - 30, 54 + 13 * lab);
+    c.globalAlpha = 1;
+  }
+
+  /* conveyor belts: bin count and crawl speed come from the wait (the app's own rule) */
+  const STEPS = [2, 4, 6, 8, 11, 15, 20, 25, 35];
+  function drawBelt(tm, dt) {
+    const { w, h, d } = fit(tm.belt), c = tm.bctx, v = val(tm);
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    const bw = 27, bh = 12, y = 9, run = w + bw;
+    if (v === null) {
+      // closed or no reading: the empty track, standing still (the app's rule)
+      c.fillStyle = 'rgba(255,255,255,.13)'; c.fillRect(0, y + bh + 3, w, 2);
+      c.fillStyle = 'rgba(255,255,255,.22)';
+      for (let x = -(1 - tm.phase) * run % 16; x < w; x += 16) c.fillRect(x, y + bh + 6, 2, 2);
+      return;
+    }
+    const col = band(v).c;
+    const bins = 1 + STEPS.filter(s => v >= s).length, target = 5 + .35 * v;
+    tm.cross += (target - tm.cross) * (RM ? 1 : 1 - Math.exp(-dt * 2));
+    tm.phase = (tm.phase + dt / tm.cross) % 1;
+    c.fillStyle = 'rgba(255,255,255,.13)'; c.fillRect(0, y + bh + 3, w, 2);
+    c.fillStyle = 'rgba(255,255,255,.22)';
+    for (let x = -(1 - tm.phase) * run % 16; x < w; x += 16) c.fillRect(x, y + bh + 6, 2, 2);
+    for (let i = 0; i < bins; i++) {
+      const x = ((tm.phase + i / bins) % 1) * run - bw;
+      const a = clamp((x + bw) / 26) * clamp((w - x) / 26);
+      c.globalAlpha = a;
+      c.fillStyle = rgb(col); c.beginPath(); c.moveTo(x, y); c.lineTo(x + bw, y); c.lineTo(x + bw - 3.4, y + bh); c.lineTo(x + 3.4, y + bh); c.closePath(); c.fill();
+      c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(x + 2.6, y + 2.2, bw - 5.2, 2.6);
+      c.fillStyle = 'rgba(255,255,255,.6)'; c.fillRect(x - 1, y - 1.2, bw + 2, 2);
+    }
+    c.globalAlpha = 1;
+  }
+
+  /* three sources flowing into one number */
+  const flowc = $('#flowc'), fc = flowc.getContext('2d'), fv = $('#fv');
+  const SRC = [[52, 199, 89], [77, 163, 255], [174, 182, 196]];
+  const motes = SRC.map((_, i) => Array.from({ length: 13 }, (_, j) => ({ u: (j + i * .37) / 13, v: .16 + Math.random() * .07 })));
+  let arrive = 0;
+  function drawFlow(dt) {
+    const { w, h, d } = fit(flowc), c = fc, base = fv.getBoundingClientRect();
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    const one = $('#one').getBoundingClientRect(), chips = [...fv.querySelectorAll('.srcs li')].map(li => li.getBoundingClientRect());
+    const vertical = one.top > chips[0].bottom;
+    arrive = Math.max(0, arrive - dt * 2);
+    chips.forEach((r, i) => {
+      let p0, p1, p2, p3;
+      if (vertical) {
+        p0 = [r.left + r.width / 2 - base.left, r.bottom - base.top]; p3 = [one.left + one.width / 2 - base.left + (i - 1) * 16, one.top - base.top];
+        const m = (p0[1] + p3[1]) / 2; p1 = [p0[0], m]; p2 = [p3[0], m];
+      } else {
+        p0 = [r.right - base.left, r.top + r.height / 2 - base.top]; p3 = [one.left - base.left, one.top + one.height / 2 - base.top + (i - 1) * 14];
+        const m = (p0[0] + p3[0]) / 2; p1 = [m, p0[1]]; p2 = [m, p3[1]];
+      }
+      const bz = u => { const a = 1 - u; return [a * a * a * p0[0] + 3 * a * a * u * p1[0] + 3 * a * u * u * p2[0] + u * u * u * p3[0], a * a * a * p0[1] + 3 * a * a * u * p1[1] + 3 * a * u * u * p2[1] + u * u * u * p3[1]]; };
+      c.strokeStyle = rgb(SRC[i], .22); c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(p0[0], p0[1]); c.bezierCurveTo(p1[0], p1[1], p2[0], p2[1], p3[0], p3[1]); c.stroke();
+      motes[i].forEach(m => {
+        if (!RM) { m.u += m.v * dt; if (m.u > 1) { m.u -= 1; arrive = 1; } }
+        for (let j = 5; j >= 0; j--) {
+          const u = m.u - j * .012; if (u < 0) continue;
+          const p = bz(u), a = (1 - j / 6) * Math.sin(Math.min(1, u * 6) * PI / 2);
+          c.fillStyle = rgb(SRC[i], a * .95); c.beginPath(); c.arc(p[0], p[1], j ? 1.8 : 2.8, 0, PI * 2); c.fill();
+        }
+      });
+    });
+    const oc = [one.left + one.width / 2 - base.left, one.top + one.height / 2 - base.top];
+    const g = c.createRadialGradient(oc[0], oc[1], 10, oc[0], oc[1], one.width * .95);
+    g.addColorStop(0, rgb(cur.mode === 'number' ? band(cur.minutes).c : MUTED, .16 + arrive * .1)); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  }
+
+  /* ── loop ── */
+  const vis = { hero: true, board: true, flow: true };
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.target.id === 'top') { vis.hero = e.isIntersecting; $('#sticky').classList.toggle('on', !e.isIntersecting); $('#sticky').setAttribute('aria-hidden', String(e.isIntersecting)); $('#sticky a.btn').tabIndex = e.isIntersecting ? -1 : 0; }
+      if (e.target.id === 'boardSec') vis.board = e.isIntersecting;
+      if (e.target.id === 'flowSec') vis.flow = e.isIntersecting;
+      if (e.target.id === 'close' && e.isIntersecting) { e.target.classList.add('play'); io.unobserve(e.target); }
+    }), { threshold: .05 });
+    ['#top', '#boardSec', '#flowSec', '#close'].forEach(s => io.observe($(s)));
+  }
+  function drawAll(dt) {
+    const now = performance.now();
+    if (vis.hero) drawField(now, dt);
+    if (vis.board) T.forEach(t => drawBelt(t, dt));
+    if (vis.flow) drawFlow(dt);
+  }
+  /* the number is released 1.7 s into the intro; the timer covers a tab whose frames are throttled */
+  function endIntro() { if (introHold && performance.now() - introT0 > 1700) { introHold = false; render(); } }
+  if (!RM) setTimeout(endIntro, 1750);
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    endIntro();
+    drawAll(dt); requestAnimationFrame(frame);
+  }
+  $('#replay').addEventListener('click', () => {
+    if (RM) return;
+    introT0 = performance.now(); introHold = true; T.forEach(t => { t.col = [255, 255, 255]; });
+    const hero = $('#top'); hero.classList.remove('intro'); void hero.offsetWidth; hero.classList.add('intro'); render(); setTimeout(endIntro, 1750);
+  });
+  if (RM) $('#replay').hidden = true;
+
+  /* closing line: word-by-word */
+  const ch = $('#closeH'); ch.innerHTML = ch.textContent.split(' ').map((w, i) => `<span style="--i:${i}">${w}</span>`).join(' ');
+
+  render();
+  load();
+  if (RM) { addEventListener('resize', () => drawAll(0)); requestAnimationFrame(() => drawAll(0)); }
+  else requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
