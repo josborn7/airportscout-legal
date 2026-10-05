@@ -647,7 +647,7 @@ const DFWModel = (() => {
 
   function drawField(now, dt) {
     const { w, h, d } = fit(field), c = fx;
-    const it = RM ? 99 : (now - introT0) / 1000, t = now / 1000;
+    const it = RM ? 99 : (now - introT0) / 1000, t = RM ? 0 : now / 1000; /* reduced motion: one still frame, the clock never moves the drawing */
     /* focus = the picked terminal, else the shortest open one, else none (overview) */
     const pk = T.find(x => x.id === state.pick) || null;
     const f = pk || T.find(x => x.id === cur.shortest && val(x) !== null) || null;
