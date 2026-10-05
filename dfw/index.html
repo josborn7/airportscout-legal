@@ -211,7 +211,7 @@ footer a { color: var(--muted); }
 </head>
 <body>
 
-<div class="sticky" id="sticky" aria-hidden="true">
+<div class="sticky" id="sticky" aria-hidden="true" inert>
   <div class="wrap">
     <a class="mark" href="#top">Airport<b>Scout</b></a>
     <div class="now word off" id="stNow"><span class="dot"></span><span id="stWhere">DFW</span><span class="n" id="stOdo"></span><span class="u">min</span></div>
@@ -360,10 +360,10 @@ const DFWModel = (() => {
     if (model == null) return out;
     if (!model.ok) { out.mode = 'feed_down'; return out; }
     const key = laneKey === 'pre' ? 'pre' : 'std';
-    let anyClosed = false;
+    let closedCount = 0;
     for (const id of TERMINALS) {
       const l = model.lanes[id][key];
-      if (l.status === 'closed') anyClosed = true;
+      if (l.status === 'closed') closedCount++;
       if (l.status === 'open' && (out.shortest === null || l.minutes < model.lanes[out.shortest][key].minutes)) out.shortest = id;
     }
     if (TERMINALS.includes(pick)) {
@@ -377,7 +377,8 @@ const DFWModel = (() => {
     if (out.shortest !== null) {
       out.mode = 'number'; out.terminal = out.shortest; out.minutes = model.lanes[out.shortest][key].minutes;
     } else {
-      out.mode = anyClosed ? 'closed' : 'unavailable';
+      /* "Closed" for the whole airport only when every terminal is closed; a mix of closed and no reading is unavailable. */
+      out.mode = closedCount === TERMINALS.length ? 'closed' : 'unavailable';
     }
     return out;
   }
@@ -866,7 +867,7 @@ const DFWModel = (() => {
   const vis = { hero: true, board: true, flow: true };
   if ('IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(e => {
-      if (e.target.id === 'top') { vis.hero = e.isIntersecting; $('#sticky').classList.toggle('on', !e.isIntersecting); $('#sticky').setAttribute('aria-hidden', String(e.isIntersecting)); $('#sticky a.btn').tabIndex = e.isIntersecting ? -1 : 0; }
+      if (e.target.id === 'top') { vis.hero = e.isIntersecting; $('#sticky').classList.toggle('on', !e.isIntersecting); $('#sticky').setAttribute('aria-hidden', String(e.isIntersecting)); $('#sticky').inert = e.isIntersecting; $('#sticky a.btn').tabIndex = e.isIntersecting ? -1 : 0; }
       if (e.target.id === 'boardSec') vis.board = e.isIntersecting;
       if (e.target.id === 'flowSec') vis.flow = e.isIntersecting;
       if (e.target.id === 'close' && e.isIntersecting) { e.target.classList.add('play'); io.unobserve(e.target); }
