@@ -8,7 +8,7 @@
 <link rel="canonical" href="https://airportscout.app/dfw/">
 <meta name="apple-itunes-app" content="app-id=6792927636">
 <meta name="theme-color" content="#040a16">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://afjlfgyzaswdaruihozn.supabase.co; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.airportscout.app; base-uri 'none'; form-action 'none'">
 <link rel="icon" type="image/png" href="/assets/icon.png">
 <link rel="apple-touch-icon" href="/assets/icon.png">
 <meta property="og:type" content="website">
@@ -317,7 +317,7 @@ footer a { color: var(--muted); }
 /* Pure data rules for this page: no DOM, no network, no clock of its own.
    Everything the endpoint sends is checked here before any of it is shown. */
 const DFWModel = (() => {
-  const PROD_API = 'https://afjlfgyzaswdaruihozn.supabase.co/functions/v1/official-waits-public?airport=DFW';
+  const PROD_API = 'https://api.airportscout.app/official-waits?airport=DFW';
   const TERMINALS = ['A', 'B', 'C', 'D', 'E'];
   const STALE_AFTER_MS = 180000;
   const REFRESH_MS = 60000;
@@ -591,7 +591,7 @@ const DFWModel = (() => {
     busy = true;
     const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
     try {
-      const r = await fetch(API, { signal: ctl.signal, credentials: 'omit', cache: 'no-store' });
+      const r = await fetch(API, { signal: ctl.signal, credentials: 'omit' });
       if (!r.ok) throw new Error('http');
       const next = DFWModel.normalize(await r.json());
       const before = T.map(val);
