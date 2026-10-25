@@ -1,0 +1,1124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MCO Security Wait Times Right Now | AirportScout</title>
+<meta name="description" content="Live MCO security wait times by checkpoint (Gates 1-59, 70-129, C230-C254) for TSA Standard and PreCheck, as posted by Orlando International. Free on iPhone.">
+<link rel="canonical" href="https://airportscout.app/mco/">
+<meta name="apple-itunes-app" content="app-id=6792927636">
+<meta name="theme-color" content="#040a16">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://api.airportscout.app; base-uri 'none'; form-action 'none'">
+<link rel="icon" type="image/png" href="/assets/icon.png">
+<link rel="apple-touch-icon" href="/assets/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="AirportScout">
+<meta property="og:title" content="MCO security wait times, live by checkpoint">
+<meta property="og:description" content="The shortest security line at MCO right now, by checkpoint, as posted by Orlando International Airport. TSA Standard and TSA PreCheck.">
+<meta property="og:url" content="https://airportscout.app/mco/">
+<meta property="og:image" content="https://airportscout.app/assets/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap">
+<!-- Generated from the shared airport page template and this airport's config block. Do not edit by hand:
+     change the template or the config and regenerate. -->
+<style>
+/* Layout: a night title sequence. Hero = the answer on the left, a top-down queue river on the right
+   where travelers really queue at each gate (queue length = the posted wait). Scroll is the timeline.
+   Single committed look (night), so no light theme. */
+:root {
+  color-scheme: dark;
+  --n0: #030812; --n1: #06142c; --n2: #0a2754; --n3: #0d3a7a;
+  --ink: #eef4ff; --muted: #8fa6cc; --faint: #5d7299;
+  --hair: rgba(160,190,255,.14); --glass: rgba(140,175,255,.06);
+  --blue: #0071e3; --blue-hi: #4da3ff; --live: #34c759;
+  --g: #30d158; --y: #ffcc00; --o: #ff9500; --r: #ff3b30;
+  --band: #8fa6cc;
+  --display: "Nunito", ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+  --body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+  --mono: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  --ease: cubic-bezier(.2,.9,.2,1);
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body { background: var(--n0); color: var(--ink); font: 16px/1.5 var(--body); overflow-x: hidden; }
+h1, h2, h3, p, ul { margin: 0; padding: 0; }
+ul { list-style: none; }
+a { color: inherit; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+:focus-visible { outline: 2px solid var(--blue-hi); outline-offset: 3px; border-radius: 8px; }
+.wrap { max-width: 1120px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 32px); }
+.eyebrow { font: 700 12px/1.2 var(--body); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+h2 { font: 900 clamp(26px, 3.6vw, 40px)/1.08 var(--display); letter-spacing: -.02em; text-wrap: balance; }
+.lede { color: var(--muted); max-width: 56ch; }
+
+/* film grain over everything (canvas-made tile, see script) */
+.grain { position: fixed; inset: 0; z-index: 40; pointer-events: none; opacity: .055; mix-blend-mode: overlay; background-repeat: repeat; background-size: 160px 160px; }
+
+/* ── odometer (sticky bar + app card) ── */
+.odo { display: inline-flex; height: 1em; line-height: 1; overflow: hidden; }
+.odo .col { width: .6em; height: 1em; overflow: hidden; transition: width .5s var(--ease), opacity .4s; }
+.odo .col.off { width: 0; opacity: 0; }
+.odo .strip { display: flex; flex-direction: column; transition: transform 1.1s var(--ease); }
+.odo .strip span { height: 1em; display: flex; align-items: center; justify-content: center; }
+
+/* ── top bar + sticky bar ── */
+.top { position: relative; z-index: 3; display: flex; align-items: center; gap: 12px; padding-block: 18px; }
+.mark { font: 900 19px/1 var(--display); letter-spacing: -.01em; text-decoration: none; }
+.mark b { color: var(--blue-hi); font-weight: 900; }
+.top .sp { flex: 1; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 800 15px/1 var(--display); text-decoration: none; border-radius: 99px; padding: 13px 20px; white-space: nowrap; transition: transform .2s, background-color .2s, box-shadow .3s; }
+.btn:hover { transform: translateY(-1px); }
+.btn.primary { background: var(--blue); color: #fff; box-shadow: 0 0 0 0 rgba(77,163,255,0); }
+.btn.primary:hover { background: #0a84ff; box-shadow: 0 8px 30px -8px rgba(77,163,255,.7); }
+.btn.small { padding: 9px 14px; font-size: 13px; }
+.sticky { position: fixed; z-index: 20; top: 0; left: 0; right: 0; padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(4,11,26,.78); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--hair); transform: translateY(-110%); transition: transform .55s var(--ease); }
+.sticky::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, var(--band), transparent); opacity: .7; transition: background .8s; }
+.sticky.on { transform: none; }
+.sticky .wrap { display: flex; align-items: center; gap: 12px; padding-block: 9px; }
+.sticky .now { display: flex; align-items: baseline; gap: 6px; font: 700 14px/1 var(--body); color: var(--muted); min-width: 0; white-space: nowrap; }
+.sticky .now .n { font: 900 22px/1 var(--display); color: var(--band); transition: color .8s, opacity .2s; }
+.sticky .now.hide .n, .sticky .now.hide .u { opacity: 0; }
+.dot { position: relative; width: 8px; height: 8px; border-radius: 50%; background: var(--live); display: inline-block; flex: none; }
+.dot::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--live); }
+
+/* ghost number that flies from the hero into the sticky bar */
+.ghost { position: fixed; z-index: 21; left: 0; top: 0; font: 900 100px/1 var(--display); letter-spacing: -.04em; color: var(--band); pointer-events: none; transform-origin: left top; will-change: transform, opacity; }
+
+/* ── hero ── */
+.hero { position: relative; overflow: hidden; isolation: isolate; padding-bottom: 28px; }
+.night { position: absolute; inset: 0; z-index: -4; background: radial-gradient(ellipse 90% 70% at 68% 46%, var(--n3) 0%, var(--n2) 34%, var(--n1) 68%, var(--n0) 100%); }
+.wash { position: absolute; z-index: -3; left: -8%; top: 22%; width: 56%; height: 52%; border-radius: 50%; background-color: var(--band); opacity: .14; filter: blur(90px); transition: background-color 1.1s, transform 1.6s var(--ease); transform: scale(var(--bloom, 0)); transform-origin: 40% 50%; }
+.spot { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: radial-gradient(420px circle at var(--mx, 70%) var(--my, 45%), rgba(140,190,255,.09), transparent 60%); transition: opacity .6s; opacity: 0; }
+.wipe { position: absolute; inset: 0; z-index: -2; pointer-events: none; opacity: .22; }
+.wm { position: absolute; z-index: -1; left: -1.5vw; bottom: -6vw; font: 900 clamp(200px, 36vw, 540px)/.8 var(--display); letter-spacing: -.05em; color: rgba(190,215,255,.035); -webkit-text-stroke: 1px rgba(190,215,255,.07); user-select: none; pointer-events: none; white-space: nowrap; opacity: 0; transition: opacity 1.2s ease; }
+.wm.in { opacity: 1; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 24px; align-items: center; }
+.copy { display: flex; flex-direction: column; gap: 14px; padding-block: 8px 20px; min-width: 0; }
+.copy .eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.livepill { display: inline-flex; align-items: center; gap: 7px; color: #7dffa0; font-weight: 800; }
+h1 { font: 900 clamp(30px, 4.2vw, 46px)/1.04 var(--display); letter-spacing: -.02em; text-wrap: balance; }
+h1 .w { display: inline-block; }
+.answer { display: flex; flex-direction: column; gap: 2px; margin-top: 6px; }
+.kicker { font: 800 15px/1.2 var(--display); color: var(--muted); }
+.big { display: flex; align-items: flex-end; gap: .06em; font: 900 clamp(128px, 21vw, 224px)/1 var(--display); letter-spacing: -.04em; color: var(--band); transition: color .9s; margin-left: -.03em; font-variant-numeric: tabular-nums; }
+.big .num { display: inline-block; transform-origin: left bottom; }
+.big .unit { font-size: .2em; letter-spacing: 0; color: var(--muted); padding-bottom: .62em; font-weight: 800; }
+.where { font: 800 clamp(18px, 2.2vw, 22px)/1.25 var(--display); display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.where span { color: var(--muted); }
+.link { font: 700 13px/1 var(--body); color: var(--blue-hi); text-decoration: underline; text-underline-offset: 3px; padding: 6px 0; }
+.seg { display: inline-flex; align-self: flex-start; padding: 4px; border-radius: 99px; background: var(--glass); border: 1px solid var(--hair); margin-top: 6px; position: relative; }
+.seg button { font: 800 14px/1 var(--display); color: var(--muted); padding: 10px 16px; border-radius: 99px; transition: color .3s; position: relative; z-index: 1; }
+.seg button[aria-pressed="true"] { color: #06142c; }
+.seg .thumb { position: absolute; z-index: 0; top: 4px; bottom: 4px; left: 4px; width: 60px; border-radius: 99px; background: var(--ink); transition: left .45s var(--ease), width .45s var(--ease); }
+.src { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
+.src b { color: var(--ink); font-weight: 700; }
+.src #age.old { color: var(--o); }
+.face { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; font: 800 9px/1 var(--body); color: #fff; letter-spacing: .02em; border: 2px solid rgba(255,255,255,.9); }
+.face.g { background: var(--live); } .face.b { background: var(--blue); } .face.s { background: #636366; }
+.person { position: relative; width: 14px; height: 15px; }
+.person::before { content: ""; position: absolute; left: 4px; top: 0; width: 6px; height: 6px; border-radius: 50%; background: #fff; }
+.person::after { content: ""; position: absolute; left: 1px; bottom: 0; width: 12px; height: 7px; border-radius: 7px 7px 2px 2px; background: #fff; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 8px; }
+.pill { font: 700 13px/1 var(--body); color: var(--muted); border: 1px solid var(--hair); border-radius: 99px; padding: 10px 14px; }
+.stage { position: relative; width: 100%; aspect-ratio: 600 / 420; max-height: 460px; justify-self: center; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent);
+  -webkit-mask-composite: source-in; mask-image: linear-gradient(to right, transparent, #000 4%, #000 96%, transparent), linear-gradient(to bottom, transparent, #000 8%, #000 92%, transparent); mask-composite: intersect; }
+.stage .title { z-index: 2; pointer-events: none; }
+.replay { position: absolute; z-index: 3; right: 0; bottom: 0; font: 700 12px/1 var(--body); color: var(--muted); border: 1px solid var(--hair); border-radius: 99px; padding: 8px 12px; background: rgba(5,13,30,.5); }
+.replay:hover { color: var(--ink); }
+
+/* ── sections ── */
+section.block { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var(--hair); position: relative; }
+.head { display: flex; flex-direction: column; gap: 10px; margin-bottom: 26px; }
+
+/* board */
+.board { display: flex; flex-direction: column; gap: 10px; }
+.row { display: grid; grid-template-columns: 46px minmax(120px, 190px) minmax(0, 1fr) auto; grid-template-areas: "b m belt n"; align-items: center; gap: 16px; width: 100%; text-align: left; padding: 14px 18px; border-radius: 20px; background: var(--glass); border: 1px solid var(--hair); transition: border-color .3s, background-color .3s, transform .3s; position: relative; overflow: hidden; }
+.row::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--rowc, transparent); opacity: .9; transition: background .8s; }
+.row:hover { transform: translateX(3px); background: rgba(140,175,255,.1); }
+.row[aria-pressed="true"] { border-color: var(--blue-hi); background: rgba(0,113,227,.16); }
+.row .badge { grid-area: b; width: 46px; height: 46px; border-radius: 14px; display: grid; place-items: center; font: 900 24px/1 var(--display); background: rgba(255,255,255,.08); color: var(--ink); }
+.row .meta { grid-area: m; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.row .meta b { font: 800 17px/1.2 var(--display); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.row .meta small { font-size: 12.5px; color: var(--muted); }
+.tag { font: 800 10px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: #06142c; background: var(--g); border-radius: 99px; padding: 4px 7px; }
+.tag.yours { background: var(--blue-hi); }
+.row canvas { grid-area: belt; width: 100%; height: 32px; display: block; }
+.row .num { grid-area: n; display: flex; align-items: flex-end; gap: 5px; font: 900 40px/1 var(--display); letter-spacing: -.03em; min-width: 92px; justify-content: flex-end; transition: color .8s; font-variant-numeric: tabular-nums; }
+.row .num em { font: 700 13px/1 var(--body); letter-spacing: 0; color: var(--muted); padding-bottom: 6px; font-style: normal; }
+.tip { margin-top: 18px; display: flex; gap: 14px; align-items: flex-start; padding: 16px 18px; border-radius: 20px; border: 1px dashed rgba(160,190,255,.3); color: var(--muted); font-size: 14.5px; }
+.tip b { color: var(--ink); }
+.tip .loop { flex: none; width: 34px; height: 22px; margin-top: 2px; border: 2px dashed #7fd0ff; border-radius: 12px; }
+.tip[hidden] { display: none; }
+div.row:hover { transform: none; background: var(--glass); }
+.about { margin-top: 18px; color: var(--muted); font-size: 14.5px; max-width: 70ch; }
+
+/* three sources */
+.flow-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 6fr); gap: 32px; align-items: center; }
+.fv { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: clamp(60px, 10vw, 130px); align-items: center; padding-block: 8px; }
+.fv canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.srcs { display: flex; flex-direction: column; gap: 14px; position: relative; }
+.srcs li { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-radius: 18px; background: var(--glass); border: 1px solid var(--hair); }
+.srcs b { display: block; font: 800 15px/1.2 var(--display); }
+.srcs small { color: var(--muted); font-size: 12.5px; }
+.one { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 22px 26px; border-radius: 26px; background: rgba(4,10,22,.72); border: 1px solid var(--hair); }
+.one .n { display: flex; align-items: flex-end; gap: 4px; font: 900 76px/1 var(--display); letter-spacing: -.04em; color: var(--band); transition: color .9s; }
+.one .n em { font: 800 16px/1 var(--display); color: var(--muted); font-style: normal; padding-bottom: 12px; }
+.one small { color: var(--muted); font-size: 12.5px; white-space: nowrap; }
+.also { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 34px; }
+.also li { padding: 16px 18px; border-top: 2px solid var(--blue-hi); background: linear-gradient(180deg, rgba(0,113,227,.12), rgba(0,113,227,0)); }
+.also b { display: block; font: 800 16px/1.25 var(--display); margin-bottom: 4px; }
+.also span { color: var(--muted); font-size: 14px; }
+
+/* closing */
+.closeSec { overflow: hidden; }
+.closeSec .bloom { position: absolute; inset: -20% -10%; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 50% 60% at 20% 50%, var(--band) 0%, transparent 60%); opacity: 0; transition: opacity 1.4s ease, background 1s; }
+.closeSec.play .bloom { opacity: .16; }
+.close { position: relative; z-index: 1; text-align: left; display: flex; flex-direction: column; gap: 18px; align-items: flex-start; }
+.close h2 { font-size: clamp(34px, 6.2vw, 76px); max-width: 14ch; }
+.close h2 span { display: inline-block; }
+footer { border-top: 1px solid var(--hair); padding-block: 26px 40px; color: var(--faint); font-size: 12.5px; display: flex; flex-direction: column; gap: 6px; }
+footer nav { display: flex; flex-wrap: wrap; gap: 6px 16px; }
+footer a { color: var(--muted); }
+
+/* ── word states: Closed / Unavailable / still checking (never a number) ── */
+.big.word { font-size: clamp(44px, 9vw, 96px); letter-spacing: -.02em; color: var(--muted); padding-block: .35em .25em; }
+@media (min-width: 861px) { .big.word { font-size: min(7.2vw, 84px); } }
+.big.word .unit, .big.word .num { display: none; }
+.big .w { display: none; } .big.word .w { display: inline; }
+.row .num.word { font: 800 20px/1 var(--display); letter-spacing: 0; color: var(--muted); }
+.row .num.word em, .row .num.word .o { display: none; }
+.row .num .w { display: none; } .row .num.word .w { display: inline; }
+.livepill.off { display: none; }
+.sticky .now.word .n, .sticky .now.word .u { display: none; }
+.sticky .now.off .dot { display: none; }
+.one .n.word em, .one .n.word #flowOdo { display: none; }
+.one .n .w { display: none; } .one .n.word .w { display: inline; color: var(--muted); }
+.row .badge.long { font-size: 13px; letter-spacing: 0; }
+.row small.old { color: var(--o); }
+
+/* ── motion ── */
+@media (prefers-reduced-motion: no-preference) {
+  .dot::after { animation: ping 1.8s ease-out infinite; }
+  @keyframes ping { from { transform: scale(1); opacity: .7; } to { transform: scale(3.2); opacity: 0; } }
+  /* hero copy: each line rises after the title sequence has landed (1.5 s) */
+  .intro .rise { animation: rise .9s var(--ease) both; animation-delay: calc(var(--i) * 110ms + 1500ms); }
+  @keyframes rise { from { opacity: 0; transform: translateY(26px); filter: blur(6px); } to { filter: blur(0); } }
+  .intro h1 .w { animation: wordIn .8s var(--ease) both; animation-delay: calc(var(--j) * 70ms + 1600ms); }
+  @keyframes wordIn { from { opacity: 0; transform: translateY(.6em) rotate(2deg); } }
+  /* board rows + flow + closing: scroll-triggered (class .in / .play), from a visible resting state */
+  .board .row { opacity: 1; transform: translateY(0); transition: opacity .7s ease, transform .9s var(--ease), border-color .3s, background-color .3s; }
+  .board.wait .row { opacity: 0; transform: translateY(34px); }
+  .board.in .row { opacity: 1; transform: translateY(0); transition-delay: calc(var(--i) * 110ms); }
+  .tip { transition: opacity .8s ease .5s, transform .9s var(--ease) .5s; }
+  .board.wait ~ .tip { opacity: 0; transform: translateY(20px); }
+  .closeSec.play h2 span { animation: wipe .9s var(--ease) both; animation-delay: calc(var(--i) * 90ms); }
+  @keyframes wipe { from { clip-path: inset(0 100% 0 0); transform: translateX(-.15em); } to { clip-path: inset(0 0 0 0); } }
+  .closeSec.play .cta { animation: rise .9s var(--ease) both; animation-delay: .6s; }
+  .big .num.settle { animation: settle .55s var(--ease); }
+  @keyframes settle { 0% { transform: scale(1.06); } 100% { transform: scale(1); } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .odo .strip, .odo .col, .big, .wash, .row, .row .num, .sticky, .sticky .now .n, .one .n, .btn, .seg .thumb, .wm { transition: none; }
+  .wash { transform: none; }
+  .wm { opacity: 1; }
+  .spot, .grain, .replay { display: none; }
+}
+
+/* ── narrow ── */
+@media (max-width: 860px) {
+  .hero-grid, .flow-grid { grid-template-columns: minmax(0, 1fr); }
+  .stage { max-width: 520px; }
+  .also { grid-template-columns: minmax(0, 1fr); }
+  .spot { display: none; }
+}
+@media (max-width: 640px) {
+  .top .mark-hide { display: none; }
+  .sticky .mark { display: none; }
+  .row { grid-template-columns: 40px minmax(0, 1fr) auto; grid-template-areas: "b m n" "belt belt belt"; gap: 10px 12px; padding: 12px 14px; }
+  .row .badge { width: 40px; height: 40px; font-size: 21px; border-radius: 12px; }
+  .row .num { font-size: 34px; min-width: 0; }
+  .row .num.word { font-size: 18px; }
+  .row .badge.long { font-size: 11.5px; }
+  .fv { grid-template-columns: minmax(0, 1fr); gap: 84px; justify-items: center; }
+  .srcs { flex-direction: row; gap: 8px; width: 100%; }
+  .srcs li { flex: 1 1 0; min-width: 0; flex-direction: column; text-align: center; padding: 10px 6px; gap: 6px; }
+  .srcs b { font-size: 12.5px; } .srcs small { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="grain" id="grain" aria-hidden="true"></div>
+
+<div class="sticky" id="sticky" aria-hidden="true" inert>
+  <div class="wrap">
+    <a class="mark" href="#top">Airport<b>Scout</b></a>
+    <div class="now word off" id="stNow"><span class="dot"></span><span id="stWhere">MCO</span><span class="n" id="stOdo"></span><span class="u">min</span></div>
+    <span style="flex:1"></span>
+    <a class="btn primary small" href="https://apps.apple.com/app/id6792927636" tabindex="-1">Get the app</a>
+  </div>
+</div>
+
+<section class="hero intro" id="top">
+  <div class="night"></div><div class="wash" id="wash"></div><div class="spot" id="spot"></div><div class="wipe" id="wipe" hidden></div><div class="wm" aria-hidden="true" id="wm">MCO</div>
+  <div class="wrap">
+    <div class="top">
+      <a class="mark" href="#top">Airport<b>Scout</b></a>
+      <span class="sp"></span>
+      <a class="btn primary small mark-hide" href="https://apps.apple.com/app/id6792927636">Get the app</a>
+    </div>
+    <div class="hero-grid">
+      <div class="copy">
+        <p class="eyebrow rise" style="--i:0"><span class="livepill off" id="livepill"><span class="dot"></span>Live</span><span id="apName">Orlando International</span></p>
+        <h1 id="h1">MCO security wait times</h1>
+        <div class="answer rise" style="--i:1">
+          <p class="kicker" id="kicker">Shortest line right now</p>
+          <div class="big word" id="big"><span class="num" id="heroNum"></span><span class="unit">min</span><span class="w" id="heroWord" aria-live="polite">&nbsp;</span></div>
+          <p class="where"><b id="whereT">Checking MCO's posted times</b><span id="whereL"></span><button class="link" id="unpick" hidden>Show the shortest line</button></p>
+        </div>
+        <div class="seg rise" style="--i:2" role="group" aria-label="Lane" id="seg">
+          <span class="thumb" aria-hidden="true"></span>
+          <button data-lane="std" aria-pressed="true">Standard</button><button data-lane="pre" aria-pressed="false">TSA PreCheck</button>
+        </div>
+        <p class="src rise" style="--i:3"><span class="face g" id="srcFace">MCO</span><span><b id="srcName">Orlando International Airport checkpoint times</b><span id="age"></span></span></p>
+        <div class="cta rise" style="--i:4">
+          <a class="btn primary" href="https://apps.apple.com/app/id6792927636">Get AirportScout for iPhone</a>
+          <span class="pill">Android coming soon</span>
+        </div>
+        <noscript><p class="lede">Live wait times need JavaScript. The AirportScout app shows them too.</p></noscript>
+      </div>
+      <div class="stage" id="stage">
+        <canvas id="field" role="img" aria-label="Top-down view of 3 checkpoints, each with a queue whose length is its current security wait"></canvas>
+        <canvas id="title" class="title" aria-hidden="true"></canvas>
+        <button class="replay" id="replay">Replay intro</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="boardSec">
+  <div class="wrap">
+    <div class="head">
+      <p class="eyebrow" id="boardEyebrow">Every checkpoint, right now</p>
+      <h2 id="boardH">Pick your checkpoint. Watch the line move.</h2>
+      <p class="lede" id="boardLede">Each belt runs at the speed of that line. More bins and a slower crawl mean a longer wait.</p>
+    </div>
+    <div class="board" id="board"></div>
+    <div class="tip"><span class="loop" aria-hidden="true"></span><p><b>Terminal C is a separate building: the Terminal Link train runs to it before security.</b> Pick the checkpoint for your gates.</p></div>
+    <p class="about">Orlando International Airport (MCO) posts live wait times for its three TSA checkpoints: Gates 1-59, Gates 70-129 and Gates C230-C254. This page shows those posted times for the TSA Standard and TSA PreCheck lanes exactly as Orlando International posts them, with the time of each reading. The checkpoints close overnight and reopen early in the morning, so the rows read Closed in the small hours. Terminal C (Gates C230-C254) is a separate building reached by the Terminal Link train before security, so pick the checkpoint for your gates. The numbers come from Orlando International Airport; AirportScout adds nothing to them.</p>
+  </div>
+</section>
+
+<section class="block" id="flowSec">
+  <div class="wrap">
+    <div class="flow-grid">
+      <div class="head" style="margin:0">
+        <p class="eyebrow">In the app</p>
+        <h2>Three sources. One number.</h2>
+        <p class="lede" id="flowLede">This page shows what Orlando International Airport posts for MCO. The app blends it with reports from travelers standing in line, and covers 300+ US airports with TSA estimates.</p>
+      </div>
+      <div class="fv" id="fv">
+        <canvas id="flowc" aria-hidden="true"></canvas>
+        <ul class="srcs">
+          <li><span class="face g" id="flowFace">MCO</span><div><b>Airport official</b><small>DFW, Houston, Orlando and Denver</small></div></li>
+          <li><span class="face b"><span class="person"></span></span><div><b>Traveler reports</b><small>from people in line now</small></div></li>
+          <li><span class="face s">TSA</span><div><b>TSA estimates</b><small>at 300+ US airports</small></div></li>
+        </ul>
+        <div class="one" id="one"><div class="n word" id="flowN"><span id="flowOdo"></span><em>min</em><span class="w" id="flowWord"></span></div><small>your lane, right now</small></div>
+      </div>
+    </div>
+    <ul class="also">
+      <li><b>Today's trend and forecast</b><span>See how the line moved today and where it is heading.</span></li>
+      <li><b>CLEAR and PreCheck lanes</b><span>Tracked separately, at every checkpoint.</span></li>
+      <li><b>Report in a few taps</b><span>Tell the next traveler what you see.</span></li>
+    </ul>
+  </div>
+</section>
+
+<section class="block closeSec" id="closeSec">
+  <div class="bloom" aria-hidden="true"></div>
+  <div class="wrap close" id="close">
+    <h2 id="closeH">Never guess the security line again.</h2>
+    <div class="cta">
+      <a class="btn primary" href="https://apps.apple.com/app/id6792927636">Get AirportScout for iPhone</a>
+      <span class="pill">Android coming soon</span>
+    </div>
+  </div>
+</section>
+
+<div class="wrap">
+  <footer>
+    <span id="ftSource">Wait times as posted by Orlando International Airport.</span>
+    <span>Not affiliated with or endorsed by the TSA or DHS.</span>
+    <span id="ftNot">Not affiliated with Orlando International Airport or the Greater Orlando Aviation Authority.</span>
+    <nav><a href="/">Home</a><a href="/privacy/">Privacy Policy</a><a href="/terms/">Terms of Service</a><a href="/support/">Support</a></nav>
+  </footer>
+</div>
+
+<script id="page-model">
+/* Pure data rules: no DOM, no network. The airport config is written in by the generator. */
+const PageModel = (() => {
+  const STALE_AFTER_MS = 180000;
+  const REFRESH_MS = 60000;
+  const OLD_AFTER_MS = 1200000;
+  const isObj = x => x !== null && typeof x === 'object';
+  const CFG = Object.freeze({"code":"MCO","name":"Orlando International","source":"Orlando International Airport","timeZone":"America/New_York","rowNoun":"checkpoint","checkpoints":[{"key":"Gates 1-59","label":"Gates 1-59","badge":"1-59"},{"key":"Gates 70-129","label":"Gates 70-129","badge":"70-129"},{"key":"Gates C230-C254","label":"Gates C230-C254","badge":"C230"}],"lanes":["std","pre"]});
+  CFG.checkpoints.forEach(c => Object.freeze(c));
+  Object.freeze(CFG.checkpoints); Object.freeze(CFG.lanes);
+  const TERMINALS = Object.freeze(CFG.checkpoints.map(c => c.key));
+  const PROD_API = 'https://api.airportscout.app/official-waits?airport=MCO';
+  const stamp = s => (typeof s === 'string' && Number.isFinite(Date.parse(s)) ? Date.parse(s) : null);
+  function lane(x) {
+    if (isObj(x) && x.status === 'open' && Number.isInteger(x.minutes) && x.minutes >= 0 && x.minutes <= 600) {
+      return { status: 'open', minutes: x.minutes, updatedAt: stamp(x.updated_at) };
+    }
+    if (isObj(x) && x.status === 'closed') {
+      const ms = typeof x.closed_since === 'string' ? Date.parse(x.closed_since) : NaN;
+      return { status: 'closed', closedSince: Number.isFinite(ms) ? ms : null, updatedAt: stamp(x.updated_at) };
+    }
+    return { status: 'unavailable' };
+  }
+  const blank = () => {
+    const o = { std: { status: 'unavailable' }, pre: { status: 'unavailable' } };
+    if (CFG.lanes.includes('clr')) o.clr = { status: 'unavailable' };
+    return o;
+  };
+  function normalize(payload) {
+    if (!isObj(payload) || payload.airport !== CFG.code || payload.status !== 'ok' || !Array.isArray(payload.terminals)) return { ok: false };
+    const generatedAt = typeof payload.generated_at === 'string' ? Date.parse(payload.generated_at) : NaN;
+    if (!Number.isFinite(generatedAt)) return { ok: false };
+    const lanes = {}, seen = {};
+    TERMINALS.forEach(id => { lanes[id] = blank(); });
+    let any = false;
+    for (const e of payload.terminals) {
+      if (!isObj(e) || typeof e.terminal !== 'string' || !TERMINALS.includes(e.terminal) || seen[e.terminal]) continue;
+      seen[e.terminal] = true;
+      const o = { std: lane(e.standard), pre: lane(e.precheck) };
+      if (CFG.lanes.includes('clr')) o.clr = lane(e.clear);
+      lanes[e.terminal] = o;
+      if (Object.values(o).some(l => l.status !== 'unavailable')) any = true;
+    }
+    if (!any) return { ok: false };
+    const up = typeof payload.updated_at === 'string' ? Date.parse(payload.updated_at) : NaN;
+    return { ok: true, updatedAt: Number.isFinite(up) ? up : null, generatedAt, lanes };
+  }
+  function view(model, laneKey, pick) {
+    const out = { mode: 'loading', terminal: null, minutes: null, shortest: null, closedSince: null, updatedAt: null };
+    if (model == null) return out;
+    if (!model.ok) { out.mode = 'feed_down'; return out; }
+    const key = (laneKey === 'pre' || (laneKey === 'clr' && CFG.lanes.includes('clr'))) ? laneKey : 'std';
+    /* "older" = the lane's own reading is OLD_AFTER_MS or more behind the response (same rule as the board rows) */
+    const oldOf = l => isOld(rowAge(model, l));
+    let closedCount = 0, bestOld = true;
+    for (const id of TERMINALS) {
+      const l = model.lanes[id][key];
+      if (l.status === 'closed') closedCount++;
+      if (l.status !== 'open') continue;
+      /* shortest: a lane that is not older beats any older lane; among equals, the lowest minutes (ties: board order) */
+      const o = oldOf(l);
+      if (out.shortest === null || (!o && bestOld) || (o === bestOld && l.minutes < model.lanes[out.shortest][key].minutes)) {
+        out.shortest = id; bestOld = o;
+      }
+    }
+    const p = TERMINALS.length === 1 ? null : pick;
+    if (TERMINALS.includes(p)) {
+      const l = model.lanes[p][key];
+      out.terminal = p; out.old = oldOf(l);
+      if (l.status === 'open') { out.mode = 'number'; out.minutes = l.minutes; out.updatedAt = l.updatedAt; }
+      else if (l.status === 'closed') { out.mode = 'closed'; out.closedSince = l.closedSince; out.updatedAt = l.updatedAt; }
+      else out.mode = 'unavailable';
+      return out;
+    }
+    if (out.shortest !== null) {
+      const l = model.lanes[out.shortest][key];
+      out.mode = 'number'; out.terminal = out.shortest; out.minutes = l.minutes; out.updatedAt = l.updatedAt; out.old = oldOf(l);
+    } else {
+      out.mode = closedCount === TERMINALS.length ? 'closed' : 'unavailable';
+    }
+    return out;
+  }
+  function ageText(sec) {
+    if (!Number.isFinite(sec) || sec < 0) return '';
+    if (sec < 50) return 'just now';
+    if (sec < 3600) return Math.round(sec / 60) + 'm ago';
+    return Math.floor(sec / 3600) + 'h ago';
+  }
+  function closedText(ms) {
+    if (ms == null || !Number.isFinite(ms)) return 'Closed';
+    try {
+      const t = new Intl.DateTimeFormat('en-US', { timeZone: CFG.timeZone, hour: 'numeric', minute: '2-digit' }).format(ms);
+      return 'Closed at ' + t.replace(/[  ]/g, ' ');
+    } catch (e) { return 'Closed'; }
+  }
+  function rowAge(model, laneObj) {
+    if (laneObj && laneObj.updatedAt != null) return model.generatedAt - laneObj.updatedAt;
+    return model.updatedAt !== null ? model.generatedAt - model.updatedAt : null;
+  }
+  const isOld = ms => ms !== null && ms >= OLD_AFTER_MS;
+  function isStale(lastGoodAt, now) { return lastGoodAt == null || now - lastGoodAt > STALE_AFTER_MS; }
+  const DEV_HOST = /^(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)$/;
+  const DEV_PATH = /^\/__(fixture\/[a-z_]+\.json|fixture\/error|live(\/[a-z]{3})?)$/;
+  function pickApi(hostname, search) {
+    if (!DEV_HOST.test(String(hostname || ''))) return PROD_API;
+    let api = null;
+    try { api = new URLSearchParams(String(search || '')).get('api'); } catch (e) { api = null; }
+    return typeof api === 'string' && DEV_PATH.test(api) ? api : PROD_API;
+  }
+  return {
+    CFG, PROD_API, TERMINALS, STALE_AFTER_MS, REFRESH_MS, OLD_AFTER_MS,
+    normalize, view, rowAge, isOld, ageText, closedText, isStale, pickApi,
+  };
+})();
+</script>
+
+<script>
+(() => {
+  /* ── this airport: the config the generator wrote into the model block ── */
+  const CFG = PageModel.CFG;
+  const SINGLE = CFG.checkpoints.length === 1;
+
+  const RM = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const FINE = matchMedia('(pointer: fine)').matches;
+  const $ = s => document.querySelector(s);
+  const BANDS = [
+    { max: 9, c: [48, 209, 88], css: 'var(--g)', word: 'Short' },
+    { max: 19, c: [255, 204, 0], css: 'var(--y)', word: 'Moderate' },
+    { max: 34, c: [255, 149, 0], css: 'var(--o)', word: 'Busy' },
+    { max: 1e9, c: [255, 59, 48], css: 'var(--r)', word: 'Long' },
+  ];
+  const band = v => BANDS.find(b => v <= b.max);
+  const rgb = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
+  const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const ease = x => 1 - Math.pow(1 - clamp(x), 3);
+  const easeExpo = x => (x = clamp(x), x === 1 ? 1 : 1 - Math.pow(2, -10 * x));
+  const easeBack = x => { x = clamp(x); const c1 = 1.4, c3 = c1 + 1; return 1 + c3 * Math.pow(x - 1, 3) + c1 * Math.pow(x - 1, 2); };
+  const easeInOut = x => (x = clamp(x), x < .5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2);
+  const PI = Math.PI;
+  const MUTED = [143, 166, 204], MUTED_CSS = '#8fa6cc', NO_READING = [120, 135, 165];
+  const LANE_NAMES = { std: 'TSA Standard', pre: 'TSA PreCheck', clr: 'CLEAR' };
+
+  const put = (el, s) => { if (el.textContent !== s) el.textContent = s; };
+  /* h1 split into words for the word-by-word entrance (text nodes only, never markup) */
+  (() => { const h = $('#h1'), words = h.textContent.split(' '); h.textContent = ''; words.forEach((w, j) => { const s = document.createElement('span'); s.className = 'w'; s.style.setProperty('--j', j); s.textContent = w; h.appendChild(s); if (j < 99) h.appendChild(document.createTextNode(' ')); }); })();
+  /* ── film grain: a 160 px noise tile drawn once ── */
+  (() => {
+    if (RM) return;
+    const g = document.createElement('canvas'); g.width = g.height = 160;
+    const c = g.getContext('2d'), im = c.createImageData(160, 160);
+    for (let i = 0; i < im.data.length; i += 4) { const v = 90 + Math.random() * 130; im.data[i] = im.data[i + 1] = im.data[i + 2] = v; im.data[i + 3] = 255; }
+    c.putImageData(im, 0, 0);
+    $('#grain').style.backgroundImage = `url(${g.toDataURL()})`;
+  })();
+
+  /* ── odometer (sticky + app card) ── */
+  function odo(el) {
+    el.classList.add('odo');
+    const cols = [0, 1].map(() => {
+      const col = document.createElement('span'); col.className = 'col'; col.setAttribute('aria-hidden', 'true');
+      const strip = document.createElement('span'); strip.className = 'strip';
+      for (let d = 0; d < 10; d++) { const s = document.createElement('span'); s.textContent = d; strip.appendChild(s); }
+      col.appendChild(strip); el.appendChild(col); return { col, strip };
+    });
+    return v => {
+      const real = Math.max(0, Math.round(v));
+      v = clamp(real, 0, 99);
+      const t = Math.floor(v / 10), o = v % 10;
+      cols[0].col.classList.toggle('off', t === 0);
+      cols[0].strip.style.transform = `translateY(-${t}em)`;
+      cols[1].strip.style.transform = `translateY(-${o}em)`;
+      el.setAttribute('aria-label', real); el.setAttribute('role', 'img');
+    };
+  }
+  const unitOf = v => (v > 99 ? 'min+' : 'min');
+
+  /* ── count-up number (hero + rows): tweens over ~1.3 s with an expo ease, settles with a tiny scale ── */
+  function counter(el, dur = 1300) {
+    let from = 0, to = 0, t0 = 0, raf = 0, shown = -1;
+    const show = v => { if (v !== shown) { shown = v; el.textContent = String(v); } };
+    const tick = now => {
+      const p = RM ? 1 : easeExpo((now - t0) / dur);
+      show(Math.round(from + (to - from) * p));
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else { raf = 0; if (!RM) { el.classList.remove('settle'); void el.offsetWidth; el.classList.add('settle'); } }
+    };
+    return (v, reset) => {
+      v = Math.max(0, Math.round(v));
+      if (reset) shown = -1;
+      from = reset ? 0 : (shown < 0 ? 0 : shown); to = v;
+      if (from === to) { show(v); return; }
+      t0 = performance.now(); cancelAnimationFrame(raf); raf = requestAnimationFrame(tick);
+    };
+  }
+
+  /* ── data: one entry per checkpoint in config order ── */
+  const T = CFG.checkpoints.map(c => ({ id: c.key, label: c.label, badgeText: c.badge }));
+  T.forEach((t, i) => { t.i = i; t.col = [255, 255, 255]; t.pulse = 0; t.phase = Math.random(); t.cross = 8; t.qphase = 0; t.qcross = 8; t.len = 0; t.enter = 0; t.ring = []; t.leavers = []; t.arrivers = []; });
+  const state = { lane: 'std', pick: null, model: null, lastGoodAt: null, recvPerf: 0, failed: false };
+  const stale = () => PageModel.isStale(state.lastGoodAt, Date.now());
+  const ln = t => (state.model && state.model.ok && !stale()) ? state.model.lanes[t.id][state.lane] : { status: 'unavailable' };
+  const val = t => { const l = ln(t); return l.status === 'open' ? l.minutes : null; };
+  const vw = () => PageModel.view(state.failed || (state.model && stale()) ? { ok: false } : state.model, state.lane, state.pick);
+  const LOADING = PageModel.view(null, 'std', null);
+  let cur = vw();
+
+  /* ── board rows ── */
+  const board = $('#board');
+  if (!RM) board.classList.add('wait');
+  T.forEach((t, i) => {
+    const b = document.createElement(SINGLE ? 'div' : 'button');
+    b.className = 'row'; b.style.setProperty('--i', i);
+    if (!SINGLE) b.setAttribute('aria-pressed', 'false');
+    b.innerHTML = `<span class="badge"></span>
+      <span class="meta"><b><span class="lbl"></span><i class="tag" hidden>Shortest</i></b><small></small></span>
+      <canvas aria-hidden="true"></canvas>
+      <span class="num word"><span class="o">0</span><em>min</em><span class="w">—</span></span>`;
+    const bd = b.querySelector('.badge'); bd.textContent = t.badgeText; bd.classList.toggle('long', t.badgeText.length > 2);
+    b.querySelector('.lbl').textContent = t.label;
+    if (!SINGLE) b.addEventListener('click', () => { state.pick = state.pick === t.id ? null : t.id; render(); });
+    board.appendChild(b);
+    t.row = b; t.tag = b.querySelector('.tag'); t.num = b.querySelector('.num'); t.setNum = counter(b.querySelector('.o'), 1100);
+    t.word = b.querySelector('.w'); t.unit = b.querySelector('em'); t.small = b.querySelector('small');
+    t.belt = b.querySelector('canvas'); t.bctx = t.belt.getContext('2d');
+  });
+
+  const setHero = counter($('#heroNum'), 1400), setSticky = odo($('#stOdo')), setFlow = odo($('#flowOdo'));
+  const big = $('#big'), heroNum = $('#heroNum'), heroUnit = $('#big .unit'), stNow = $('#stNow'), stUnit = $('#stNow .u'), flowN = $('#flowN'), flowUnit = $('#flowN em');
+  const sinceRecv = () => (performance.now() - state.recvPerf) / 1000;
+  const ageSec = () => (state.model.generatedAt - state.model.updatedAt) / 1000 + sinceRecv();
+  const labelOf = id => (T.find(t => t.id === id) || { label: id }).label;
+  let introHold = !RM, lastHeroMode = 'loading', lastHeroVal = null;
+
+  /* lane switch: the thumb slides; the hero takes a colour wipe from the pressed button */
+  const seg = $('#seg'), thumb = seg.querySelector('.thumb');
+  function placeThumb() {
+    const b = seg.querySelector('button[aria-pressed="true"]'); if (!b) return;
+    thumb.style.left = b.offsetLeft + 'px'; thumb.style.width = b.offsetWidth + 'px';
+  }
+  function colourWipe(fromEl, colour) {
+    if (RM) return;
+    const hero = $('#top'), w = $('#wipe'), hr = hero.getBoundingClientRect(), br = fromEl.getBoundingClientRect();
+    const x = br.left + br.width / 2 - hr.left, y = br.top + br.height / 2 - hr.top;
+    const R = Math.hypot(Math.max(x, hr.width - x), Math.max(y, hr.height - y));
+    w.hidden = false; w.style.background = colour;
+    w.animate([{ clipPath: `circle(0px at ${x}px ${y}px)`, opacity: .3 }, { clipPath: `circle(${R}px at ${x}px ${y}px)`, opacity: 0 }], { duration: 1100, easing: 'cubic-bezier(.2,.9,.2,1)' }).onfinish = () => { w.hidden = true; };
+  }
+
+  function render() {
+    const v = cur = vw();
+    const feedOk = v.mode === 'number' || v.mode === 'closed' || v.mode === 'unavailable';
+    const laneName = LANE_NAMES[state.lane] || LANE_NAMES.std;
+    const wide = CFG.code + ' security right now', yours = `Your ${CFG.rowNoun} right now`;
+
+    const hv = introHold && v.mode === 'number' ? LOADING : v;
+    const picked = !SINGLE && state.pick !== null && hv.terminal === state.pick;
+    let kicker = SINGLE ? 'Security right now' : 'Shortest line right now', word = ' ', whereT = `Checking ${CFG.code}'s posted times`, whereL = '', bandCss = MUTED_CSS;
+    if (hv.mode === 'number') {
+      if (!SINGLE) kicker = picked ? yours : 'Shortest line right now';
+      whereT = labelOf(hv.terminal); whereL = laneName; bandCss = rgb(band(hv.minutes).c);
+    } else if (hv.mode === 'closed') {
+      word = 'Closed';
+      if (picked) {
+        const ct = PageModel.closedText(hv.closedSince);
+        kicker = yours; whereT = labelOf(hv.terminal);
+        whereL = laneName + ' · ' + ct.charAt(0).toLowerCase() + ct.slice(1);
+      } else {
+        kicker = SINGLE ? 'Security right now' : wide;
+        whereT = SINGLE ? T[0].label : 'All ' + CFG.rowNoun + 's'; whereL = 'No ' + laneName + ' lane is open';
+      }
+    } else if (hv.mode === 'unavailable') {
+      word = 'Unavailable';
+      if (picked) { kicker = yours; whereT = labelOf(hv.terminal); whereL = laneName + ' · no current reading'; }
+      else { kicker = SINGLE ? 'Security right now' : wide; whereT = laneName; whereL = CFG.code + ' is not posting times for this lane right now'; }
+    } else if (hv.mode === 'feed_down') {
+      word = 'Unavailable'; kicker = SINGLE ? 'Security right now' : wide;
+      whereT = CFG.code + ' is not posting wait times right now.'; whereL = 'The app still has traveler reports and TSA estimates.';
+    }
+    document.documentElement.style.setProperty('--band', bandCss);
+    document.documentElement.style.setProperty('--bloom', hv.mode === 'loading' ? 0 : 1);
+    put($('#kicker'), kicker); put($('#whereT'), whereT); put($('#whereL'), whereL);
+    if (hv.mode === 'number') {
+      const wasWord = big.classList.contains('word');
+      big.classList.remove('word');
+      setHero(hv.minutes, wasWord || lastHeroVal === null);
+      put(heroUnit, unitOf(hv.minutes)); lastHeroVal = hv.minutes;
+    } else {
+      big.classList.add('word'); put($('#heroWord'), word); lastHeroVal = null;
+    }
+    lastHeroMode = hv.mode;
+    $('#unpick').hidden = SINGLE || !(picked && state.pick);
+    $('#livepill').classList.toggle('off', !feedOk);
+    /* the hero age is the shown lane's own age (with the same "older" mark as its board row); the top-level stamp
+       stands in only for a number whose lane carries no stamp (deploy gap); a word state never borrows another
+       lane's freshness */
+    let age = '', heroOld = false;
+    if (feedOk && state.model && state.model.ok) {
+      if (v.updatedAt != null) {
+        const ms = state.model.generatedAt - v.updatedAt + (performance.now() - state.recvPerf);
+        heroOld = PageModel.isOld(ms); age = PageModel.ageText(ms / 1000);
+      } else if (v.mode === 'number' && state.model.updatedAt !== null) age = PageModel.ageText(ageSec());
+    }
+    put($('#age'), age ? ' · ' + age + (heroOld ? ' · older' : '') : v.mode === 'feed_down' ? ' · unavailable' : '');
+    $('#age').classList.toggle('old', heroOld);
+
+    const isNum = v.mode === 'number';
+    stNow.classList.toggle('word', !isNum); stNow.classList.toggle('off', !feedOk);
+    put($('#stWhere'), isNum ? (SINGLE ? CFG.code : CFG.code + ' · ' + labelOf(v.terminal)) : v.mode === 'closed' ? CFG.code + ' · Closed' : v.mode === 'loading' ? CFG.code : CFG.code + ' · Unavailable');
+    flowN.classList.toggle('word', !isNum);
+    if (isNum) { setSticky(v.minutes); put(stUnit, unitOf(v.minutes)); setFlow(v.minutes); put(flowUnit, unitOf(v.minutes)); }
+    else put($('#flowWord'), '—');
+
+    const rowAgeText = l => {
+      if (!state.model || !state.model.ok) return { text: '', old: false };
+      const ra = PageModel.rowAge(state.model, l);
+      const ms = ra === null ? null : ra + (performance.now() - state.recvPerf);
+      const old = PageModel.isOld(ms), a = ms === null ? '' : PageModel.ageText(ms / 1000);
+      return { text: a ? a + (old ? ' · older' : '') : '', old };
+    };
+    T.forEach(t => {
+      const l = ln(t), isP = !SINGLE && state.pick === t.id, isS = !SINGLE && v.shortest === t.id;
+      let small = CFG.source, old = false;
+      if (l.status === 'open') {
+        const wasWord = t.num.classList.contains('word');
+        t.num.classList.remove('word'); t.setNum(l.minutes, wasWord); put(t.unit, unitOf(l.minutes));
+        t.num.style.color = rgb(band(l.minutes).c); t.row.style.setProperty('--rowc', rgb(band(l.minutes).c));
+        const ra = rowAgeText(l); old = ra.old;
+        small = ra.text ? CFG.source + ' · ' + ra.text : CFG.source;
+        t.row.setAttribute('aria-label', `${t.label}, ${l.minutes} minutes`);
+      } else {
+        t.num.classList.add('word'); t.num.style.color = ''; t.row.style.setProperty('--rowc', 'transparent');
+        if (l.status === 'closed') {
+          put(t.word, 'Closed');
+          const ra = rowAgeText(l); old = ra.old;
+          small = (l.closedSince === null ? CFG.source : PageModel.closedText(l.closedSince)) + (ra.text ? ' · ' + ra.text : '');
+          t.row.setAttribute('aria-label', `${t.label}, closed`);
+        } else if (v.mode === 'loading') {
+          put(t.word, '—'); small = CFG.source;
+          t.row.setAttribute('aria-label', `${t.label}, checking`);
+        } else {
+          put(t.word, '—'); small = 'Unavailable';
+          t.row.setAttribute('aria-label', `${t.label}, unavailable`);
+        }
+      }
+      put(t.small, small); t.small.classList.toggle('old', old);
+      if (!SINGLE) t.row.setAttribute('aria-pressed', String(isP));
+      t.tag.hidden = !(isS || isP);
+      put(t.tag, isP ? 'Your line' : 'Shortest');
+      t.tag.classList.toggle('yours', isP);
+    });
+    if (RM) drawAll(0);
+  }
+  $('#unpick').addEventListener('click', () => { state.pick = null; render(); });
+  document.querySelectorAll('.seg button').forEach(btn => btn.addEventListener('click', () => {
+    if (!CFG.lanes.includes(btn.dataset.lane) || state.lane === btn.dataset.lane) return;
+    state.lane = btn.dataset.lane;
+    document.querySelectorAll('.seg button').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
+    placeThumb();
+    const nv = vw();
+    colourWipe(btn, nv.mode === 'number' ? rgb(band(nv.minutes).c) : MUTED_CSS);
+    T.forEach(t => { t.pulse = 1; });
+    render();
+  }));
+  addEventListener('resize', placeThumb);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(placeThumb);
+
+  /* ── live data: this airport's posted times from the public endpoint, every minute while the tab is visible ── */
+  const API = PageModel.pickApi(location.hostname, location.search);
+  let busy = false;
+  async function load() {
+    if (busy) return;
+    busy = true;
+    const ctl = new AbortController(), to = setTimeout(() => ctl.abort(), 8000);
+    try {
+      const r = await fetch(API, { signal: ctl.signal, credentials: 'omit' });
+      if (!r.ok) throw new Error('http');
+      const next = PageModel.normalize(await r.json());
+      const before = T.map(val);
+      state.model = next; state.failed = false; state.recvPerf = performance.now();
+      if (next.ok) state.lastGoodAt = Date.now();
+      T.forEach((t, i) => { const a = val(t); if (a !== null && before[i] !== null && a !== before[i]) t.pulse = 1; });
+    } catch (e) {
+      if (stale()) state.failed = true;   // keep the last good numbers only while they are under 3 minutes old
+    } finally { clearTimeout(to); busy = false; render(); }
+  }
+  setInterval(() => { if (document.visibilityState === 'visible') load(); }, PageModel.REFRESH_MS);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') { render(); load(); } });
+  /* keeps the age text moving and drops the numbers once they are 3 minutes past the last good response */
+  setInterval(render, 5000);
+
+  /* ── canvases ── */
+  const fit = cv => {
+    const r = cv.getBoundingClientRect(), d = Math.min(2, devicePixelRatio || 1);
+    const w = Math.max(1, Math.round(r.width * d)), h = Math.max(1, Math.round(r.height * d));
+    if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+    return { w: r.width, h: r.height, d };
+  };
+  const W = 600, H = 420, N = T.length;
+
+  /* ═══ title sequence: the airport code assembles from runway lights ═══ */
+  const title = $('#title'), tx = title.getContext('2d');
+  let dots = [], introT0 = performance.now(), titleDone = RM, titleReady = false;
+  const T_FLY = [.15, 1.55], T_HOLD = [1.55, 2.35], T_GO = [2.35, 3.25];
+  function buildTitle() {
+    const off = document.createElement('canvas'); off.width = W; off.height = H;
+    const c = off.getContext('2d');
+    c.fillStyle = '#fff'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    c.font = '900 190px Nunito, system-ui, sans-serif'; c.fillText(CFG.code, W / 2, H / 2 - 6);
+    const im = c.getImageData(0, 0, W, H).data, step = 5;
+    dots = [];
+    for (let y = step / 2; y < H; y += step) for (let x = step / 2; x < W; x += step) {
+      if (im[((y | 0) * W + (x | 0)) * 4 + 3] > 120) {
+        const d = { tx: x + (Math.random() - .5) * 1.5, ty: y + (Math.random() - .5) * 1.5 };
+        d.sx = -140 + Math.random() * (W + 280); d.sy = H / 2 + (Math.random() - .5) * 6 + Math.sin(d.sx / 40) * 3;
+        d.delay = (x / W) * .55 + Math.random() * .25;
+        d.vx = 60 + Math.random() * 220; d.vy = -40 - Math.random() * 120; d.r = 1.6 + Math.random() * 1.4;
+        d.hue = Math.random() < .12 ? [255, 204, 0] : [205, 225, 255];
+        dots.push(d);
+      }
+    }
+    titleReady = true;
+  }
+  function drawTitle(now) {
+    const { w, h, d } = fit(title), c = tx;
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    if (RM || titleDone || !titleReady) return;
+    const it = (now - introT0) / 1000, s = Math.min(w / W, h / H);
+    c.translate((w - W * s) / 2, (h - H * s) / 2); c.scale(s, s);
+    // the runway line the lights sit on
+    const rl = ease(it / .5), ro = clamp(1 - (it - T_GO[0]) / .5);
+    c.strokeStyle = `rgba(190,215,255,${.25 * ro})`; c.lineWidth = 1;
+    c.beginPath(); c.moveTo(W / 2 - (W / 2 + 120) * rl, H / 2); c.lineTo(W / 2 + (W / 2 + 120) * rl, H / 2); c.stroke();
+    const goP = easeInOut((it - T_GO[0]) / (T_GO[1] - T_GO[0]));
+    for (const p of dots) {
+      const fp = easeBack((it - T_FLY[0] - p.delay) / (T_FLY[1] - T_FLY[0] - .6));
+      let x = p.sx + (p.tx - p.sx) * fp, y = p.sy + (p.ty - p.sy) * fp, a = .9;
+      if (it > T_HOLD[0]) { const sh = Math.sin(it * 9 + p.tx * .05) * .12; a = .78 + sh; }
+      if (it > T_GO[0]) { x += p.vx * goP; y += p.vy * goP * goP; a *= 1 - goP; }
+      if (a <= 0) continue;
+      c.fillStyle = rgb(p.hue, a); c.beginPath(); c.arc(x, y, p.r, 0, PI * 2); c.fill();
+    }
+    // glow bloom under the code once it has landed
+    if (it > T_HOLD[0] - .2 && it < T_GO[1]) {
+      const g = c.createRadialGradient(W / 2, H / 2, 10, W / 2, H / 2, 240);
+      const ga = clamp((it - T_HOLD[0] + .2) / .4) * (1 - goP) * .22;
+      g.addColorStop(0, `rgba(140,190,255,${ga})`); g.addColorStop(1, 'rgba(140,190,255,0)');
+      c.fillStyle = g; c.fillRect(-20, -20, W + 40, H + 40);
+    }
+    if (it > T_GO[1] + .2) { titleDone = true; c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h); }
+  }
+
+  /* ═══ queue river: top-down, one lane per checkpoint. Queue length = the posted wait; one traveler
+         clears the gate every (5 + .35 * wait) s, the belt rule. ═══ */
+  const field = $('#field'), fx = field.getContext('2d');
+  const LX = 92, GX = 428, OUTX = W + 30;            // label column, gate x, where leavers vanish
+  const LH = Math.min(78, 300 / N), Y0 = 70 + (300 - LH * N) / 2;
+  T.forEach((t, i) => { t.cy = Y0 + (i + .5) * LH; });
+  const SP = 9;                                       // spacing between queued travelers
+  const qlen = v => clamp(v * 9, 14, GX - LX - 40);   // px of queue for v minutes (35 min fills the lane)
+  let sweep = 0, par = { x: 0, y: 0, tx: 0, ty: 0 };
+  if (FINE && !RM) {
+    const stage = $('#stage');
+    stage.addEventListener('pointermove', e => { const r = stage.getBoundingClientRect(); par.tx = (e.clientX - r.left) / r.width - .5; par.ty = (e.clientY - r.top) / r.height - .5; });
+    stage.addEventListener('pointerleave', () => { par.tx = 0; par.ty = 0; });
+    const hero = $('#top'), spot = $('#spot');
+    hero.addEventListener('pointermove', e => { const r = hero.getBoundingClientRect(); spot.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%'); spot.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%'); spot.style.opacity = 1; });
+    hero.addEventListener('pointerleave', () => { spot.style.opacity = 0; });
+  }
+
+  function gate(c, x, cy, hh, k = 1) {
+    // a security gate seen from above: two posts and the arch between them, scaled by k
+    const h = hh * k, r = 6 * k;
+    c.beginPath(); c.moveTo(x - 7 * k, cy - h); c.lineTo(x + 7 * k, cy - h); c.lineTo(x + 7 * k, cy + h); c.lineTo(x - 7 * k, cy + h); c.closePath();
+  }
+
+  function drawRiver(now, dt) {
+    const { w, h, d } = fit(field), c = fx;
+    const it = RM ? 99 : (now - introT0) / 1000, t = RM ? 0 : now / 1000;
+    const pk = T.find(x => x.id === state.pick) || null;
+    const f = pk || T.find(x => x.id === cur.shortest && val(x) !== null) || null;
+    const s = Math.min(w / W, h / H), lab = Math.max(1, .8 / s);
+    const kp = RM ? 1 : 1 - Math.exp(-dt * 4);
+    par.x += (par.tx - par.x) * kp; par.y += (par.ty - par.y) * kp;
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    c.translate((w - W * s) / 2, (h - H * s) / 2); c.scale(s, s);
+    c.lineCap = 'round'; c.lineJoin = 'round';
+    const scene = clamp((it - 2.3) / .9);           // the river fades in as the title leaves
+    if (scene <= 0) return;
+    c.globalAlpha = scene;
+
+    // graticule: deepest parallax layer
+    c.save(); c.translate(par.x * -10, par.y * -8);
+    c.strokeStyle = 'rgba(150,185,255,.05)'; c.lineWidth = 1;
+    for (let x = -80; x <= W + 80; x += 76) { c.beginPath(); c.moveTo(x, -40); c.lineTo(x, H + 40); c.stroke(); }
+    for (let y = -38; y <= H + 60; y += 76) { c.beginPath(); c.moveTo(-80, y); c.lineTo(W + 80, y); c.stroke(); }
+    c.restore();
+
+    c.save(); c.translate(par.x * 14, par.y * 10);
+    // the secure side: a faint wash to the right of the gates
+    const sg = c.createLinearGradient(GX, 0, W, 0);
+    sg.addColorStop(0, 'rgba(120,170,255,.07)'); sg.addColorStop(1, 'rgba(120,170,255,0)');
+    c.fillStyle = sg; c.fillRect(GX, Y0 - 24, W - GX + 40, LH * N + 48);
+    c.strokeStyle = 'rgba(200,222,255,.16)'; c.lineWidth = 1.5; c.setLineDash([3, 7]);
+    c.beginPath(); c.moveTo(GX, Y0 - 24); c.lineTo(GX, Y0 + LH * N + 24); c.stroke(); c.setLineDash([]);
+
+    sweep = ((t / 9) % 1) * (W + 200) - 100;
+    T.forEach((tm, i) => {
+      const l = ln(tm), open = l.status === 'open', v = open ? l.minutes : null, isF = tm === f;
+      const ap = ease((it - 2.4 - i * .14) / .8);   // lane entrance, staggered
+      const target = (open ? band(v).c : NO_READING), gl = open ? 1 : .3;
+      const kc = RM ? 1 : 1 - Math.exp(-dt * 5);
+      tm.col = tm.col.map((x, j) => x + (target[j] - x) * kc);
+      tm.pulse = Math.max(0, tm.pulse - dt * 1.2);
+      const dim = state.pick ? (isF ? 1 : .35) : 1;
+      if (ap <= 0) return;
+      const cy = tm.cy, hh = LH * .36;
+      c.save(); c.globalAlpha = scene * dim * ap;
+
+      // the lane: a soft track from the label column through the gate
+      const lg = c.createLinearGradient(LX, 0, OUTX, 0);
+      lg.addColorStop(0, rgb(tm.col, 0)); lg.addColorStop(.35, rgb(tm.col, .06)); lg.addColorStop(.72, rgb(tm.col, .1)); lg.addColorStop(1, rgb(tm.col, 0));
+      c.fillStyle = lg; c.fillRect(LX, cy - hh * .9, OUTX - LX, hh * 1.8);
+
+      if (open) {
+        // queue geometry
+        const want = qlen(v); tm.len += (want - tm.len) * (RM ? 1 : 1 - Math.exp(-dt * 3));
+        const cross = 5 + .35 * v; tm.qcross += (cross - tm.qcross) * (RM ? 1 : 1 - Math.exp(-dt * 2));
+        const K = Math.max(1, Math.floor(tm.len / SP));
+        const prev = tm.qphase; tm.qphase = (tm.qphase + dt / tm.qcross) % 1;
+        if (tm.qphase < prev && !RM) { tm.pulse = 1; tm.leavers.push({ x: GX + 8, y: cy, a: 1 }); tm.arrivers.push({ u: 0 }); }
+        const tail = GX - 10 - K * SP;
+        // queue rail (the posted wait as a bar) + its end cap
+        c.strokeStyle = rgb(tm.col, .22); c.lineWidth = hh * 1.1;
+        c.beginPath(); c.moveTo(tail - 4, cy); c.lineTo(GX - 8, cy); c.stroke();
+        // queued travelers shuffle forward one slot per crossing; a gentle serpentine in y
+        const pour = clamp((it - 2.6 - i * .14) / 1.0);
+        for (let k = 0; k < K; k++) {
+          const u = k + tm.qphase, x0 = GX - 10 - u * SP;
+          const pd = clamp((pour - (k / K) * .7) / .3), x = x0 - (1 - ease(pd)) * 160;
+          const y = cy + Math.sin(u * 1.9 + i) * hh * .28;
+          const a = (k === K - 1 ? 1 - tm.qphase : 1) * clamp(pd * 2);
+          c.fillStyle = rgb(tm.col.map(z => z + (255 - z) * .45), .95 * a);
+          c.beginPath(); c.arc(x, y, 2.6, 0, PI * 2); c.fill();
+          c.fillStyle = rgb(tm.col, .35 * a); c.beginPath(); c.arc(x, y, 4.2, 0, PI * 2); c.fill();
+        }
+        // arrivers walk in from the left and reach the tail exactly when the queue shuffles
+        tm.arrivers = tm.arrivers.filter(ar => (ar.u += dt / tm.qcross) < 1);
+        for (const ar of tm.arrivers) {
+          const x = LX + 30 + (tail - LX - 30) * ar.u, y = cy + Math.sin(ar.u * 6 + i) * hh * .3;
+          c.fillStyle = rgb(tm.col.map(z => z + (255 - z) * .45), .9 * clamp(ar.u * 4)); c.beginPath(); c.arc(x, y, 2.6, 0, PI * 2); c.fill();
+        }
+        // leavers accelerate past the gate and fade into the secure side
+        tm.leavers = tm.leavers.filter(lv => (lv.x += (90 + (lv.x - GX) * 1.6) * dt, lv.a = 1 - (lv.x - GX) / (OUTX - GX), lv.a > 0));
+        for (const lv of tm.leavers) {
+          c.fillStyle = `rgba(230,240,255,${.9 * lv.a})`; c.beginPath(); c.arc(lv.x, lv.y + Math.sin(lv.x / 18) * 3, 2.6, 0, PI * 2); c.fill();
+          c.strokeStyle = `rgba(230,240,255,${.3 * lv.a})`; c.lineWidth = 1.5; c.beginPath(); c.moveTo(lv.x - 14, lv.y); c.lineTo(lv.x - 3, lv.y); c.stroke();
+        }
+      } else {
+        // closed or no reading: an empty rail, a bar across the gate
+        c.strokeStyle = rgb(NO_READING, .14); c.lineWidth = hh * 1.1;
+        c.beginPath(); c.moveTo(GX - 90, cy); c.lineTo(GX - 8, cy); c.stroke();
+        if (l.status === 'closed') { c.strokeStyle = rgb(NO_READING, .8); c.lineWidth = 3; c.beginPath(); c.moveTo(GX - 12, cy); c.lineTo(GX + 12, cy); c.stroke(); }
+      }
+
+      // the gate: glow in the wait colour, a pulse each time someone clears it
+      const near = clamp(1 - Math.abs(sweep - GX) / 140);
+      c.shadowColor = rgb(tm.col, clamp(.45 * gl * (1 + near * .6 + tm.pulse * 1.8))); c.shadowBlur = 22 * s * d;
+      gate(c, GX, cy, hh); c.fillStyle = rgb(tm.col, .16 + tm.pulse * .25); c.fill();
+      c.strokeStyle = rgb(tm.col, open ? 1 : .6); c.lineWidth = 2.5; c.stroke();
+      c.shadowBlur = 0; c.shadowColor = 'rgba(0,0,0,0)';
+      // pulse ring
+      if (tm.pulse > 0 && !RM) { c.strokeStyle = rgb(tm.col, tm.pulse * .6); c.lineWidth = 2; gate(c, GX, cy, hh, 1 + (1 - tm.pulse) * .9); c.stroke(); }
+      // focus: a slow breathing ring on the lane the hero shows
+      if (isF && open && !RM) { const q = (t / 2.2) % 1; c.strokeStyle = rgb(tm.col, (1 - q) * .45); c.lineWidth = 1.5; gate(c, GX, cy, hh, 1.15 + q * .5); c.stroke(); }
+      c.restore();
+
+      // labels: badge + minutes in the label column, left of the lane
+      const la = clamp((it - 2.9 - i * .12) / .5);
+      c.save(); c.globalAlpha = scene * la * (.5 + .5 * dim);
+      c.textAlign = 'right'; c.textBaseline = 'middle';
+      // a long badge (MCO "70-129") shrinks to fit the label column, so it is never cut at the canvas edge
+      const bs = (tm.badgeText.length > 2 ? 15 : 24) * lab, room = LX - 14 - 8;
+      c.fillStyle = '#eef4ff'; c.font = `900 ${bs}px Nunito, system-ui, sans-serif`;
+      const bw = c.measureText(tm.badgeText).width;
+      if (bw > room) c.font = `900 ${bs * room / bw}px Nunito, system-ui, sans-serif`;
+      c.fillText(tm.badgeText, LX - 14, cy - 9 * lab);
+      c.fillStyle = rgb(tm.col); c.font = `800 ${13 * lab}px Nunito, system-ui, sans-serif`;
+      c.fillText(open ? v + ' min' : l.status === 'closed' ? 'Closed' : '—', LX - 14, cy + 10 * lab);
+      c.restore();
+    });
+    c.restore();
+
+    // feed sweep: a soft band of light crossing the scene
+    if (!RM && it > 3.4) {
+      const g = c.createLinearGradient(sweep - 80, 0, sweep + 10, 0);
+      g.addColorStop(0, 'rgba(140,200,255,0)'); g.addColorStop(.85, 'rgba(140,200,255,.05)'); g.addColorStop(1, 'rgba(190,230,255,.14)');
+      c.fillStyle = g; c.fillRect(sweep - 80, 0, 90, H);
+    }
+    // chart furniture
+    const fa = clamp((it - 3.2) / .8);
+    c.globalAlpha = scene * fa; c.fillStyle = 'rgba(143,166,204,.75)'; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.font = `${10.5 * lab}px ui-monospace, Consolas, monospace`;
+    // below the last lane's minutes label: on a phone the labels scale up (lab > 1) and would meet it
+    const fy = Math.max(H - 48 * lab, Y0 + (N - .5) * LH + 32 * lab);
+    c.fillText(CFG.code + '  ' + CFG.name, 24, fy);
+    c.fillText('Queues from above · not a map', 24, fy + 14 * lab);
+    c.textAlign = 'right'; c.fillText('secure side →', W - 24, Y0 - 30 * lab);
+    c.globalAlpha = 1;
+  }
+
+  /* conveyor belts: bin count and crawl speed come from the wait (the app's own rule).
+     Bins roll in from the left when the board scrolls into view. */
+  const STEPS = [2, 4, 6, 8, 11, 15, 20, 25, 35];
+  function drawBelt(tm, dt) {
+    const { w, h, d } = fit(tm.belt), c = tm.bctx, v = val(tm);
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    const bw = 27, bh = 12, y = 9, run = w + bw;
+    tm.enter = RM ? 1 : tm.enter;
+    const en = ease(tm.enter), slide = (1 - en) * -w;
+    c.fillStyle = 'rgba(255,255,255,.13)'; c.fillRect(0, y + bh + 3, w * en, 2);
+    c.fillStyle = 'rgba(255,255,255,.22)';
+    for (let x = -(1 - tm.phase) * run % 16; x < w * en; x += 16) c.fillRect(x, y + bh + 6, 2, 2);
+    if (v === null) return;
+    const col = band(v).c;
+    const bins = 1 + STEPS.filter(s => v >= s).length, target = 5 + .35 * v;
+    tm.cross += (target - tm.cross) * (RM ? 1 : 1 - Math.exp(-dt * 2));
+    tm.phase = (tm.phase + dt / tm.cross) % 1;
+    for (let i = 0; i < bins; i++) {
+      const x = ((tm.phase + i / bins) % 1) * run - bw + slide;
+      const a = clamp((x + bw) / 26) * clamp((w - x) / 26);
+      c.globalAlpha = a;
+      c.fillStyle = rgb(col); c.beginPath(); c.moveTo(x, y); c.lineTo(x + bw, y); c.lineTo(x + bw - 3.4, y + bh); c.lineTo(x + 3.4, y + bh); c.closePath(); c.fill();
+      c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(x + 2.6, y + 2.2, bw - 5.2, 2.6);
+      c.fillStyle = 'rgba(255,255,255,.6)'; c.fillRect(x - 1, y - 1.2, bw + 2, 2);
+    }
+    c.globalAlpha = 1;
+  }
+
+  /* three sources flowing into one number: the paths draw themselves when the section arrives,
+     then the motes start to travel */
+  const flowc = $('#flowc'), fc = flowc.getContext('2d'), fv = $('#fv');
+  const SRC = [[52, 199, 89], [77, 163, 255], [174, 182, 196]];
+  const motes = SRC.map((_, i) => Array.from({ length: 13 }, (_, j) => ({ u: (j + i * .37) / 13, v: .16 + Math.random() * .07 })));
+  let arrive = 0, flowIn = RM ? 1 : 0;
+  function drawFlow(dt) {
+    const { w, h, d } = fit(flowc), c = fc, base = fv.getBoundingClientRect();
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h);
+    const one = $('#one').getBoundingClientRect(), chips = [...fv.querySelectorAll('.srcs li')].map(li => li.getBoundingClientRect());
+    const vertical = one.top > chips[0].bottom;
+    arrive = Math.max(0, arrive - dt * 2);
+    chips.forEach((r, i) => {
+      let p0, p1, p2, p3;
+      if (vertical) {
+        p0 = [r.left + r.width / 2 - base.left, r.bottom - base.top]; p3 = [one.left + one.width / 2 - base.left + (i - 1) * 16, one.top - base.top];
+        const m = (p0[1] + p3[1]) / 2; p1 = [p0[0], m]; p2 = [p3[0], m];
+      } else {
+        p0 = [r.right - base.left, r.top + r.height / 2 - base.top]; p3 = [one.left - base.left, one.top + one.height / 2 - base.top + (i - 1) * 14];
+        const m = (p0[0] + p3[0]) / 2; p1 = [m, p0[1]]; p2 = [m, p3[1]];
+      }
+      const bz = u => { const a = 1 - u; return [a * a * a * p0[0] + 3 * a * a * u * p1[0] + 3 * a * u * u * p2[0] + u * u * u * p3[0], a * a * a * p0[1] + 3 * a * a * u * p1[1] + 3 * a * u * u * p2[1] + u * u * u * p3[1]]; };
+      const drawTo = ease(clamp((flowIn - i * .12) / .7));
+      c.strokeStyle = rgb(SRC[i], .22); c.lineWidth = 1.5;
+      c.beginPath(); c.moveTo(p0[0], p0[1]);
+      for (let k = 1; k <= 40; k++) { const p = bz(drawTo * k / 40); c.lineTo(p[0], p[1]); }
+      c.stroke();
+      if (drawTo > .98) motes[i].forEach(m => {
+        if (!RM) { m.u += m.v * dt; if (m.u > 1) { m.u -= 1; arrive = 1; } }
+        for (let j = 5; j >= 0; j--) {
+          const u = m.u - j * .012; if (u < 0) continue;
+          const p = bz(u), a = (1 - j / 6) * Math.sin(Math.min(1, u * 6) * PI / 2);
+          c.fillStyle = rgb(SRC[i], a * .95); c.beginPath(); c.arc(p[0], p[1], j ? 1.8 : 2.8, 0, PI * 2); c.fill();
+        }
+      });
+    });
+    const oc = [one.left + one.width / 2 - base.left, one.top + one.height / 2 - base.top];
+    const g = c.createRadialGradient(oc[0], oc[1], 10, oc[0], oc[1], one.width * .95);
+    g.addColorStop(0, rgb(cur.mode === 'number' ? band(cur.minutes).c : MUTED, (.16 + arrive * .1) * ease(flowIn))); g.addColorStop(1, 'rgba(0,0,0,0)');
+    c.fillStyle = g; c.fillRect(0, 0, w, h);
+  }
+
+  /* ═══ scroll choreography ═══ */
+  const vis = { hero: true, board: true, flow: true };
+  let docked = false, ghostAnim = null;
+  function dock(on) {
+    if (docked === on) return; docked = on;
+    const st = $('#sticky');
+    st.classList.toggle('on', on); st.setAttribute('aria-hidden', String(!on)); st.inert = !on; $('#sticky a.btn').tabIndex = on ? 0 : -1;
+    if (RM || cur.mode !== 'number' || introHold) return;
+    // the hero number flies into the sticky bar (and back)
+    const from = heroNum.getBoundingClientRect(), to = $('#stOdo').getBoundingClientRect();
+    if (ghostAnim) { ghostAnim.cancel(); ghostAnim = null; }
+    const gh = document.createElement('div'); gh.className = 'ghost'; gh.textContent = heroNum.textContent; document.body.appendChild(gh);
+    gh.style.fontSize = '100px';
+    const gr = gh.getBoundingClientRect();
+    const kF = from.height / gr.height, kT = to.height / gr.height;
+    const A = { transform: `translate(${from.left}px, ${from.top}px) scale(${kF})`, opacity: 1 };
+    const B = { transform: `translate(${to.left}px, ${Math.max(to.top, 8)}px) scale(${kT})`, opacity: .9 };
+    stNow.classList.add('hide');
+    ghostAnim = gh.animate(on ? [A, B] : [B, A], { duration: 650, easing: 'cubic-bezier(.3,.9,.2,1)' });
+    ghostAnim.onfinish = () => { gh.remove(); ghostAnim = null; stNow.classList.remove('hide'); };
+  }
+  if ('IntersectionObserver' in window) {
+    const io = new IntersectionObserver(es => es.forEach(e => {
+      if (e.target.id === 'top') vis.hero = e.isIntersecting;
+      if (e.target.id === 'big') dock(!e.isIntersecting && e.boundingClientRect.top < 0);
+      if (e.target.id === 'boardSec') vis.board = e.isIntersecting;
+      if (e.target.id === 'flowSec') vis.flow = e.isIntersecting;
+      if (e.target.id === 'closeSec' && e.isIntersecting) { e.target.classList.add('play'); io.unobserve(e.target); }
+    }), { threshold: .02 });
+    ['#top', '#big', '#boardSec', '#flowSec', '#closeSec'].forEach(s => io.observe($(s)));
+    // the board rows and belts arrive when the board is well into view; the flow paths draw when theirs is
+    const io2 = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return;
+      if (e.target.id === 'board') { board.classList.remove('wait'); board.classList.add('in'); T.forEach((t, i) => setTimeout(() => { t.entering = true; }, i * 110 + 200)); io2.unobserve(e.target); }
+      if (e.target.id === 'fv') { flowGo = true; io2.unobserve(e.target); }
+    }), { threshold: .35 });
+    io2.observe(board); io2.observe(fv);
+  } else { board.classList.remove('wait'); T.forEach(t => { t.enter = 1; }); flowIn = 1; $('#closeSec').classList.add('play'); }
+  let flowGo = RM;
+
+  function drawAll(dt) {
+    const now = performance.now();
+    if (vis.hero) { drawRiver(now, dt); drawTitle(now); }
+    if (vis.board) T.forEach(t => { if (t.entering) t.enter = Math.min(1, t.enter + dt / .9); drawBelt(t, dt); });
+    if (vis.flow) { if (flowGo) flowIn = Math.min(1.3, flowIn + dt / 1.2); drawFlow(dt); }
+  }
+  /* the number is released as the code dissolves (2.5 s); the timer covers a tab whose frames are throttled */
+  function endIntro() { if (introHold && performance.now() - introT0 > 2500) { introHold = false; $('#wm').classList.add('in'); render(); } }
+  if (!RM) setTimeout(endIntro, 2550); else $('#wm').classList.add('in');
+  let last = performance.now();
+  function frame(now) {
+    const dt = Math.min(.05, (now - last) / 1000); last = now;
+    endIntro();
+    drawAll(dt); requestAnimationFrame(frame);
+  }
+  function replay() {
+    if (RM) return;
+    introT0 = performance.now(); introHold = true; titleDone = false;
+    T.forEach(t => { t.col = [255, 255, 255]; t.len = 0; t.leavers = []; t.arrivers = []; });
+    $('#wm').classList.remove('in');
+    const hero = $('#top'); hero.classList.remove('intro'); void hero.offsetWidth; hero.classList.add('intro'); render(); setTimeout(endIntro, 2550);
+  }
+  $('#replay').addEventListener('click', replay);
+  if (RM) $('#replay').hidden = true;
+
+  /* closing line: word-by-word wipe */
+  const ch = $('#closeH'); ch.innerHTML = ch.textContent.split(' ').map((w, i) => `<span style="--i:${i}">${w}</span>`).join(' ');
+
+  /* ── start: wait for Nunito so the particle text is the real glyphs (800 ms cap) ── */
+  function start() {
+    buildTitle(); introT0 = performance.now();
+    render(); load(); placeThumb();
+    if (RM) { addEventListener('resize', () => drawAll(0)); requestAnimationFrame(() => drawAll(0)); }
+    else requestAnimationFrame(frame);
+  }
+  let started = false; const go = () => { if (!started) { started = true; start(); } };
+  if (document.fonts && document.fonts.load) { document.fonts.load('900 190px Nunito').then(go, go); setTimeout(go, 800); } else go();
+})();
+</script>
+</body>
+</html>
