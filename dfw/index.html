@@ -99,6 +99,7 @@ h1 { font: 900 clamp(30px, 4.2vw, 46px)/1.04 var(--display); letter-spacing: -.0
 .seg button[aria-pressed="true"] { background: var(--ink); color: #06142c; }
 .src { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--muted); flex-wrap: wrap; }
 .src b { color: var(--ink); font-weight: 700; }
+.src #age.old { color: var(--o); }
 .face { flex: none; width: 30px; height: 30px; border-radius: 50%; display: inline-grid; place-items: center; font: 800 9px/1 var(--body); color: #fff; letter-spacing: .02em; border: 2px solid rgba(255,255,255,.9); }
 .face.g { background: var(--live); } .face.b { background: var(--blue); } .face.s { background: #636366; }
 .person { position: relative; width: 14px; height: 15px; }
@@ -126,6 +127,7 @@ section.block { padding-block: clamp(48px, 7vw, 88px); border-top: 1px solid var
 .row .meta { grid-area: m; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .row .meta b { font: 800 17px/1.2 var(--display); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 .row .meta small { font-size: 12.5px; color: var(--muted); }
+.row small.old { color: var(--o); }
 .tag { font: 800 10px/1 var(--body); letter-spacing: .08em; text-transform: uppercase; color: #06142c; background: var(--g); border-radius: 99px; padding: 4px 7px; }
 .tag.yours { background: var(--blue-hi); }
 .row canvas { grid-area: belt; width: 100%; height: 32px; display: block; }
@@ -321,16 +323,18 @@ const DFWModel = (() => {
   const TERMINALS = ['A', 'B', 'C', 'D', 'E'];
   const STALE_AFTER_MS = 180000;
   const REFRESH_MS = 60000;
+  const OLD_AFTER_MS = 1200000;
   const isObj = x => x !== null && typeof x === 'object';
+  const stamp = s => (typeof s === 'string' && Number.isFinite(Date.parse(s)) ? Date.parse(s) : null);
 
   /* One lane: a number only when DFW posts it open with a whole number of minutes from 0 to 600. */
   function lane(x) {
     if (isObj(x) && x.status === 'open' && Number.isInteger(x.minutes) && x.minutes >= 0 && x.minutes <= 600) {
-      return { status: 'open', minutes: x.minutes };
+      return { status: 'open', minutes: x.minutes, updatedAt: stamp(x.updated_at) };
     }
     if (isObj(x) && x.status === 'closed') {
       const ms = typeof x.closed_since === 'string' ? Date.parse(x.closed_since) : NaN;
-      return { status: 'closed', closedSince: Number.isFinite(ms) ? ms : null };
+      return { status: 'closed', closedSince: Number.isFinite(ms) ? ms : null, updatedAt: stamp(x.updated_at) };
     }
     return { status: 'unavailable' };
   }
@@ -354,34 +358,49 @@ const DFWModel = (() => {
     return { ok: true, updatedAt: Number.isFinite(up) ? up : null, generatedAt, lanes };
   }
 
-  /* What the hero shows. Shortest = the lowest minutes among open terminals for the lane (ties: A before B ...). */
+  /* What the hero shows. Shortest = a terminal that is not older beats any older one; among equals the lowest
+     minutes for the lane wins (ties: A before B ...). */
   function view(model, laneKey, pick) {
-    const out = { mode: 'loading', terminal: null, minutes: null, shortest: null, closedSince: null };
+    const out = { mode: 'loading', terminal: null, minutes: null, shortest: null, closedSince: null, updatedAt: null };
     if (model == null) return out;
     if (!model.ok) { out.mode = 'feed_down'; return out; }
     const key = laneKey === 'pre' ? 'pre' : 'std';
-    let closedCount = 0;
+    /* "older" = the lane's own reading is OLD_AFTER_MS or more behind the response (same rule as the board rows) */
+    const oldOf = l => isOld(rowAge(model, l));
+    let closedCount = 0, bestOld = true;
     for (const id of TERMINALS) {
       const l = model.lanes[id][key];
       if (l.status === 'closed') closedCount++;
-      if (l.status === 'open' && (out.shortest === null || l.minutes < model.lanes[out.shortest][key].minutes)) out.shortest = id;
+      if (l.status !== 'open') continue;
+      const o = oldOf(l);
+      if (out.shortest === null || (!o && bestOld) || (o === bestOld && l.minutes < model.lanes[out.shortest][key].minutes)) {
+        out.shortest = id; bestOld = o;
+      }
     }
     if (TERMINALS.includes(pick)) {
       const l = model.lanes[pick][key];
-      out.terminal = pick;
-      if (l.status === 'open') { out.mode = 'number'; out.minutes = l.minutes; }
-      else if (l.status === 'closed') { out.mode = 'closed'; out.closedSince = l.closedSince; }
+      out.terminal = pick; out.old = oldOf(l);
+      if (l.status === 'open') { out.mode = 'number'; out.minutes = l.minutes; out.updatedAt = l.updatedAt; }
+      else if (l.status === 'closed') { out.mode = 'closed'; out.closedSince = l.closedSince; out.updatedAt = l.updatedAt; }
       else out.mode = 'unavailable';
       return out;
     }
     if (out.shortest !== null) {
-      out.mode = 'number'; out.terminal = out.shortest; out.minutes = model.lanes[out.shortest][key].minutes;
+      const l = model.lanes[out.shortest][key];
+      out.mode = 'number'; out.terminal = out.shortest; out.minutes = l.minutes; out.updatedAt = l.updatedAt; out.old = oldOf(l);
     } else {
       /* "Closed" for the whole airport only when every terminal is closed; a mix of closed and no reading is unavailable. */
       out.mode = closedCount === TERMINALS.length ? 'closed' : 'unavailable';
     }
     return out;
   }
+
+  /* A row's age: its own stamp when the lane has one, else the top-level stamp, else none. */
+  function rowAge(model, laneObj) {
+    if (laneObj && laneObj.updatedAt != null) return model.generatedAt - laneObj.updatedAt;
+    return model.updatedAt !== null ? model.generatedAt - model.updatedAt : null;
+  }
+  const isOld = ms => ms !== null && ms >= OLD_AFTER_MS;
 
   function ageText(sec) {
     if (!Number.isFinite(sec) || sec < 0) return '';
@@ -416,7 +435,7 @@ const DFWModel = (() => {
     return typeof api === 'string' && DEV_PATH.test(api) ? api : PROD_API;
   }
 
-  return { PROD_API, TERMINALS, STALE_AFTER_MS, REFRESH_MS, normalize, view, ageText, closedText, isStale, pickApi };
+  return { PROD_API, TERMINALS, STALE_AFTER_MS, REFRESH_MS, OLD_AFTER_MS, normalize, view, rowAge, isOld, ageText, closedText, isStale, pickApi };
 })();
 </script>
 
@@ -536,8 +555,18 @@ const DFWModel = (() => {
     }
     $('#unpick').hidden = !(picked && state.pick);
     $('#livepill').classList.toggle('off', !feedOk);
-    const age = feedOk && state.model && state.model.updatedAt !== null ? DFWModel.ageText(ageSec()) : '';
-    put($('#age'), age ? ' · ' + age : v.mode === 'feed_down' ? ' · unavailable' : '');
+    /* the hero age is the shown lane's own age (with the same "older" mark as its board row); the top-level stamp
+       stands in only for a number whose lane carries no stamp (deploy gap); a word state never borrows another
+       lane's freshness */
+    let age = '', heroOld = false;
+    if (feedOk && state.model && state.model.ok) {
+      if (v.updatedAt != null) {
+        const ms = state.model.generatedAt - v.updatedAt + (performance.now() - state.recvPerf);
+        heroOld = DFWModel.isOld(ms); age = DFWModel.ageText(ms / 1000);
+      } else if (v.mode === 'number' && state.model.updatedAt !== null) age = DFWModel.ageText(ageSec());
+    }
+    put($('#age'), age ? ' · ' + age + (heroOld ? ' · older' : '') : v.mode === 'feed_down' ? ' · unavailable' : '');
+    $('#age').classList.toggle('old', heroOld);
 
     /* sticky bar + the app card: a number only in number mode */
     const isNum = v.mode === 'number';
@@ -547,28 +576,39 @@ const DFWModel = (() => {
     if (isNum) { setSticky(v.minutes); put(stUnit, unitOf(v.minutes)); setFlow(v.minutes); put(flowUnit, unitOf(v.minutes)); }
     else put($('#flowWord'), '—');
 
-    /* board */
+    /* board: every row shows its own age, marked older at 20 minutes */
+    const rowAgeText = l => {
+      if (!state.model || !state.model.ok) return { text: '', old: false };
+      const ra = DFWModel.rowAge(state.model, l);
+      const ms = ra === null ? null : ra + (performance.now() - state.recvPerf);
+      const old = DFWModel.isOld(ms), a = ms === null ? '' : DFWModel.ageText(ms / 1000);
+      return { text: a ? a + (old ? ' · older' : '') : '', old };
+    };
     T.forEach(t => {
       const l = ln(t), isP = state.pick === t.id, isS = v.shortest === t.id;
+      let small = 'DFW official', old = false;
       if (l.status === 'open') {
         t.num.classList.remove('word'); t.setNum(l.minutes); put(t.unit, unitOf(l.minutes));
         t.num.style.color = rgb(band(l.minutes).c);
-        put(t.small, 'DFW official');
+        const ra = rowAgeText(l); old = ra.old;
+        small = ra.text ? 'DFW official · ' + ra.text : 'DFW official';
         t.row.setAttribute('aria-label', `Terminal ${t.id}, ${l.minutes} minutes`);
       } else {
         t.num.classList.add('word'); t.num.style.color = '';
         if (l.status === 'closed') {
           put(t.word, 'Closed');
-          put(t.small, l.closedSince === null ? 'DFW official' : DFWModel.closedText(l.closedSince));
+          const ra = rowAgeText(l); old = ra.old;
+          small = (l.closedSince === null ? 'DFW official' : DFWModel.closedText(l.closedSince)) + (ra.text ? ' · ' + ra.text : '');
           t.row.setAttribute('aria-label', `Terminal ${t.id}, closed`);
         } else if (v.mode === 'loading') {
-          put(t.word, '—'); put(t.small, 'DFW official');
+          put(t.word, '—'); small = 'DFW official';
           t.row.setAttribute('aria-label', `Terminal ${t.id}, checking`);
         } else {
-          put(t.word, '—'); put(t.small, 'Unavailable');
+          put(t.word, '—'); small = 'Unavailable';
           t.row.setAttribute('aria-label', `Terminal ${t.id}, unavailable`);
         }
       }
+      put(t.small, small); t.small.classList.toggle('old', old);
       t.row.setAttribute('aria-pressed', String(isP));
       t.tag.hidden = !(isS || isP);
       put(t.tag, isP ? 'Your line' : 'Shortest');
